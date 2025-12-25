@@ -18,21 +18,19 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/slots', require('./routes/slotRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
+// Database Connection
+connectDB();
+
 // Basic Route
 app.get('/', (req, res) => {
-  res.send('Pool Management System API is running...');
+  res.json({ message: 'Pool Management System API is operational' });
 });
 
-const startServer = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on port ${PORT}`.yellow.bold);
-    });
-  } catch (err) {
-    console.error('Failed to start server:'.red, err);
-    process.exit(1);
-  }
-};
+// Export for Vercel
+module.exports = app;
 
-startServer();
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`.yellow.bold);
+  });
+}
