@@ -133,11 +133,11 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-[#fafbfc] flex font-sans relative overflow-x-hidden">
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden fixed top-6 left-6 z-50">
+            {/* Mobile Menu Button (move to right) */}
+            <div className="lg:hidden fixed top-6 right-6 z-50">
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-3 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 active:scale-95 transition-all"
+                    className="p-3 bg-[#5a0000] text-white rounded-2xl shadow-xl border border-[#5a0000] active:scale-95 transition-all"
                 >
                     {isMobileMenuOpen ? '✕' : '☰'}
                 </button>
@@ -151,11 +151,12 @@ const AdminDashboard = () => {
                 ></div>
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar (anchor right on mobile, left on desktop) */}
             <aside className={`
                 ${isSidebarOpen ? 'w-72' : 'w-24'} 
-                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                bg-[#5a0000] text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
+                ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                fixed lg:sticky top-0 right-0 lg:right-auto lg:left-0 h-screen z-50
+                bg-[#5a0000] text-white transition-all duration-300 flex flex-col
             `}>
                 <div className="p-8 border-b border-slate-800/50">
                     <Logo size="md" dark showText={isSidebarOpen} />

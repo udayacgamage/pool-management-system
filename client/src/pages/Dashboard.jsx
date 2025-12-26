@@ -118,8 +118,8 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-[#f8faff] flex font-sans relative overflow-x-hidden">
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden fixed top-6 left-6 z-50">
+            {/* Mobile Menu Button (move to right) */}
+            <div className="lg:hidden fixed top-6 right-6 z-50">
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="p-3 bg-mg-dark text-white rounded-2xl shadow-xl border border-mg-dark active:scale-95 transition-all"
@@ -136,11 +136,12 @@ const Dashboard = () => {
                 ></div>
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar (anchor right on mobile, left on desktop) */}
             <aside className={`
                 ${isSidebarOpen ? 'w-72' : 'w-20'} 
-                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                bg-mg-dark text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
+                ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                fixed lg:sticky top-0 right-0 lg:right-auto lg:left-0 h-screen z-50
+                bg-mg-dark text-white transition-all duration-300 flex flex-col
             `}>
                 <div className="p-6">
                     <Logo size="md" dark showText={isSidebarOpen} />
