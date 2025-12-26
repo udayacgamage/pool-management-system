@@ -100,7 +100,15 @@ const Landing = () => {
 
                         {/* Right actions: Student Portal */}
                         <div className="flex items-center gap-4">
-                            {/* Mobile Menu Button */}
+                            {/* Mobile-only Portal button (placed before toggle) */}
+                            <Link
+                                to={getPortalRoute(user)}
+                                className="btn-maroon motion-soft !px-4 !py-2 text-xs uppercase tracking-widest block md:hidden"
+                            >
+                                {getPortalLabel(user)}
+                            </Link>
+
+                            {/* Mobile Menu Button (now appears after portal button) */}
                             <button
                                 className="md:hidden p-2 rounded-lg border border-slate-200 text-slate-700 active:scale-95"
                                 onClick={() => setIsMobileMenuOpen(true)}
@@ -108,9 +116,11 @@ const Landing = () => {
                             >
                                 ☰
                             </button>
+
+                            {/* Desktop Portal button (hidden on mobile) */}
                             <Link
                                 to={getPortalRoute(user)}
-                                className="btn-maroon !px-6 !py-3 motion-soft"
+                                className="btn-maroon motion-soft !px-6 !py-3 hidden md:inline-flex"
                             >
                                 {getPortalLabel(user)}
                             </Link>
