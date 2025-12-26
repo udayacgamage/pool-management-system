@@ -31,3 +31,14 @@
 3. [x] Set up basic Express server in `server/index.js`.
 4. [x] Complete Feature Implementation (Auth, Booking, Admin, Scanner).
 5. [ ] **User Action Required**: Ensure MongoDB is running locally to proceed with testing.
+
+## 5. Deployment (Vercel)
+- [ ] **Backend (Vercel Functions)**:
+  - [x] Create `server/vercel.json` for serverless configuration.
+  - [x] Configure `server.js` to export `app` and avoid `app.listen` in production.
+  - [x] Optimize `db.js` for serverless connection pooling.
+  - [ ] Set up a new project on Vercel with `server` as root.
+- [ ] **Frontend (Vercel)**:
+  - [x] Configure `client/vercel.json` for SPA routing.
+  - [ ] Set up a new project on Vercel with `client` as root.
+  - [ ] Configure `VITE_API_BASE_URL` env var.

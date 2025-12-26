@@ -96,6 +96,7 @@ const Dashboard = () => {
     };
 
     const groupedSlots = slots.reduce((acc, slot) => {
+        if (!slot || !slot.startTime) return acc; // Safety check
         const date = new Date(slot.startTime).toDateString();
         if (!acc[date]) acc[date] = [];
         acc[date].push(slot);

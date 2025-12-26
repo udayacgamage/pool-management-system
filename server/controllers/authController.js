@@ -12,7 +12,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body; // Removed role from destructuring
 
     try {
         if (!name || !email || !password) {
@@ -28,12 +28,17 @@ const registerUser = async (req, res) => {
             throw new Error('User already exists');
         }
 
+        // Generate unique QR Code for the student
+        // Format: USJ-<RandomString>-<Timestamp>
+        const qrCode = `USJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+
         // Create user
         const user = await User.create({
             name,
             email,
             password,
-            role: role || 'student', // Default to student if not specified (be careful with admin)
+            role: 'student', // Force role to student for public registration
+            qrCode
         });
 
         if (user) {
@@ -42,6 +47,7 @@ const registerUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                qrCode: user.qrCode,
                 token: generateToken(user._id),
             });
         } else {
@@ -69,6 +75,7 @@ const loginUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                qrCode: user.qrCode,
                 token: generateToken(user._id),
             });
         } else {

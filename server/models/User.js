@@ -23,7 +23,7 @@ const userSchema = mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ['student', 'staff', 'admin'],
+            enum: ['student', 'staff', 'admin', 'coach'],
             default: 'student',
         },
         studentId: {
@@ -32,6 +32,14 @@ const userSchema = mongoose.Schema(
         department: {
             type: String, // For staff
         },
+        specialization: {
+            type: String, // For coaches
+        },
+        qrCode: {
+            type: String,
+            unique: true,
+            sparse: true
+        }
     },
     {
         timestamps: true,

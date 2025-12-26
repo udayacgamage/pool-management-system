@@ -6,9 +6,11 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import QRScanner from './pages/QRScanner';
+import CoachDashboard from './pages/CoachDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import StaffRoute from './components/StaffRoute';
+import CoachRoute from './components/CoachRoute';
 
 function App() {
   return (
@@ -30,6 +32,11 @@ function App() {
       {/* Staff Routes */}
       <Route element={<StaffRoute />}>
         <Route path="/scanner" element={<QRScanner />} />
+      </Route>
+
+      {/* Coach Routes */}
+      <Route element={<CoachRoute />}>
+        <Route path="/coach" element={<CoachDashboard />} />
       </Route>
     </Routes>
   );

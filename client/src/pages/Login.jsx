@@ -21,6 +21,8 @@ const Login = () => {
                 navigate('/admin');
             } else if (userData.role === 'staff') {
                 navigate('/scanner');
+            } else if (userData.role === 'coach') {
+                navigate('/coach');
             } else {
                 navigate('/dashboard');
             }

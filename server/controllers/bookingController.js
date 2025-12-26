@@ -31,8 +31,14 @@ const createBooking = async (req, res) => {
         }
 
         // 4. Create Booking
-        // Generate simple QR Code Data (can be UUID or encrypted string)
-        const qrCodeData = `${userId}-${slotId}-${Date.now()}`;
+        // Use the User's unique QR Code
+        let qrCodeData = req.user.qrCode;
+
+        // Fallback: If user (legacy) doesn't have a QR code, generate and save one now
+        if (!qrCodeData) {
+            qrCodeData = `USJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+            await User.findByIdAndUpdate(userId, { qrCode: qrCodeData });
+        }
 
         const booking = await Booking.create({
             user: userId,
@@ -112,14 +118,40 @@ const verifyBooking = async (req, res) => {
         let booking;
 
         // Find booking by ID directly or by QR Data string
-        // Since we didn't index qrCodeData yet, let's just search by ID if provided, or scan if unique.
-        // For simplicity, let's assume the QR code contains the Booking Object ID or we search by the qrString.
-
         if (bookingId) {
             booking = await Booking.findById(bookingId).populate('user').populate('slot');
         } else if (qrCodeData) {
-            // In a real app we'd search by qrCodeData field
-            booking = await Booking.findOne({ qrCodeData }).populate('user').populate('slot');
+            // NEW LOGIC: Find active booking for this User's QR code
+            
+            // 1. Find all confirmed bookings associated with this QR code
+            const bookings = await Booking.find({ 
+                qrCodeData, 
+                status: 'confirmed' 
+            }).populate('user').populate('slot');
+
+            if (!bookings || bookings.length === 0) {
+                res.status(404);
+                throw new Error('No active bookings found for this QR code');
+            }
+
+            // 2. Find the booking that matches the CURRENT time
+            const now = new Date();
+            
+            // Logic: Current time must be within [SlotStart - 30mins, SlotEnd]
+            booking = bookings.find(b => {
+                if (!b.slot) return false; // Safety check for deleted slots
+
+                const slotStart = new Date(b.slot.startTime);
+                const slotEnd = new Date(b.slot.endTime);
+                const entryStart = new Date(slotStart.getTime() - 30 * 60000); // Allow entry 30 mins before
+                
+                return now >= entryStart && now <= slotEnd;
+            });
+
+            if (!booking) {
+                res.status(400);
+                throw new Error('No booking scheduled for the current time');
+            }
         }
 
         if (!booking) {
