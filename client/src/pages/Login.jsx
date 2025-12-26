@@ -119,7 +119,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full flex justify-center items-center py-4 px-4 btn-primary motion-soft !text-lg !rounded-xl !shadow-primary-700/30 disabled:opacity-70 disabled:cursor-not-wait"
+                            className="w-full flex justify-center items-center py-4 px-4 btn-maroon motion-soft !text-lg !rounded-xl !shadow-primary-700/30 disabled:opacity-70 disabled:cursor-not-wait"
                         >
                             {isLoading ? (
                                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
