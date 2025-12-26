@@ -39,8 +39,9 @@ const admin = (req, res, next) => {
     }
 }
 
+// Updated: Coaches can also act as Staff (to verify students)
 const staff = (req, res, next) => {
-    if (req.user && (req.user.role === 'staff' || req.user.role === 'admin')) {
+    if (req.user && (req.user.role === 'staff' || req.user.role === 'admin' || req.user.role === 'coach')) {
         next();
     } else {
         res.status(401);

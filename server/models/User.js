@@ -38,7 +38,8 @@ const userSchema = mongoose.Schema(
         qrCode: {
             type: String,
             unique: true,
-            sparse: true
+            sparse: true,
+            uppercase: true, // enforce uppercase on save
         }
     },
     {

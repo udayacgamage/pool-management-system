@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { generateUniqueQrCode } = require('../utils/qr');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -28,9 +29,8 @@ const registerUser = async (req, res) => {
             throw new Error('User already exists');
         }
 
-        // Generate unique QR Code for the student
-        // Format: USJ-<RandomString>-<Timestamp>
-        const qrCode = `USJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+        // Generate unique uppercase QR Code
+        const qrCode = await generateUniqueQrCode();
 
         // Create user
         const user = await User.create({
@@ -47,6 +47,7 @@ const registerUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                specialization: user.specialization,
                 qrCode: user.qrCode,
                 token: generateToken(user._id),
             });
@@ -75,7 +76,8 @@ const loginUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                qrCode: user.qrCode,
+                specialization: user.specialization,
+                qrCode: user.qrCode, // return the same QR code
                 token: generateToken(user._id),
             });
         } else {
@@ -97,7 +99,9 @@ const getMe = async (req, res) => {
             id: user._id,
             name: user.name,
             email: user.email,
-            role: user.role
+            role: user.role,
+            specialization: user.specialization,
+            qrCode: user.qrCode, // added
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -138,10 +142,24 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// @desc    Public list of coaches
+// @route   GET /api/auth/coaches
+// @access  Public
+const getCoaches = async (req, res) => {
+    try {
+        const coaches = await User.find({ role: 'coach' })
+            .select('name email specialization');
+        res.status(200).json(coaches);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     getMe,
     getAllUsers,
-    deleteUser
+    deleteUser,
+    getCoaches
 };

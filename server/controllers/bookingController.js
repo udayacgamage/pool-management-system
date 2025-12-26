@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const Slot = require('../models/Slot');
 const User = require('../models/User');
+const { generateUniqueQrCode } = require('../utils/qr');
 
 // @desc    Book a slot
 // @route   POST /api/bookings
@@ -10,47 +11,45 @@ const createBooking = async (req, res) => {
         const { slotId } = req.body;
         const userId = req.user.id;
 
-        // 1. Check if slot exists
+        // Load slot once
         const slot = await Slot.findById(slotId);
         if (!slot) {
             res.status(404);
             throw new Error('Slot not found');
         }
 
-        // 2. Check if slot is full
+        // Capacity check
         if (slot.bookings.length >= slot.capacity) {
             res.status(400);
             throw new Error('Slot is fully booked');
         }
 
-        // 3. Check if user already booked this slot
+        // Prevent duplicate booking
         const existingBooking = await Booking.findOne({ user: userId, slot: slotId });
         if (existingBooking) {
             res.status(400);
             throw new Error('You have already booked this slot');
         }
 
-        // 4. Create Booking
-        // Use the User's unique QR Code
-        let qrCodeData = req.user.qrCode;
-
-        // Fallback: If user (legacy) doesn't have a QR code, generate and save one now
-        if (!qrCodeData) {
-            qrCodeData = `USJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-            await User.findByIdAndUpdate(userId, { qrCode: qrCodeData });
+        // Ensure persistent QR (legacy users)
+        if (!req.user.qrCode) {
+            const newQr = await generateUniqueQrCode();
+            await User.findByIdAndUpdate(userId, { qrCode: newQr });
+            req.user.qrCode = newQr;
         }
 
+        // Create booking using user QR
         const booking = await Booking.create({
             user: userId,
             slot: slotId,
-            qrCodeData,
+            qrCodeData: req.user.qrCode,
         });
 
-        // 5. Update Slot bookings array
+        // Update slot bookings
         slot.bookings.push(userId);
-        await slot.save(); // Check for atomicity in real prod, but fine for now
+        await slot.save();
 
-        res.status(201).json(booking);
+        res.status(200).json(booking);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -117,34 +116,34 @@ const verifyBooking = async (req, res) => {
     try {
         let booking;
 
-        // Find booking by ID directly or by QR Data string
         if (bookingId) {
             booking = await Booking.findById(bookingId).populate('user').populate('slot');
         } else if (qrCodeData) {
-            // NEW LOGIC: Find active booking for this User's QR code
-            
-            // 1. Find all confirmed bookings associated with this QR code
-            const bookings = await Booking.find({ 
-                qrCodeData, 
-                status: 'confirmed' 
+            // Resolve user by their unique, uppercase QR code
+            const code = String(qrCodeData).toUpperCase();
+            const user = await User.findOne({ qrCode: code });
+            if (!user) {
+                res.status(404);
+                throw new Error('QR not recognized');
+            }
+
+            // Find this user's confirmed bookings and pick the one in the current time window
+            const bookings = await Booking.find({
+                user: user._id,
+                status: 'confirmed'
             }).populate('user').populate('slot');
 
             if (!bookings || bookings.length === 0) {
                 res.status(404);
-                throw new Error('No active bookings found for this QR code');
+                throw new Error('No active bookings for this user');
             }
 
-            // 2. Find the booking that matches the CURRENT time
             const now = new Date();
-            
-            // Logic: Current time must be within [SlotStart - 30mins, SlotEnd]
             booking = bookings.find(b => {
-                if (!b.slot) return false; // Safety check for deleted slots
-
+                if (!b.slot) return false;
                 const slotStart = new Date(b.slot.startTime);
                 const slotEnd = new Date(b.slot.endTime);
-                const entryStart = new Date(slotStart.getTime() - 30 * 60000); // Allow entry 30 mins before
-                
+                const entryStart = new Date(slotStart.getTime() - 30 * 60000);
                 return now >= entryStart && now <= slotEnd;
             });
 
@@ -168,19 +167,6 @@ const verifyBooking = async (req, res) => {
             res.status(400);
             throw new Error('Booking already used/attended');
         }
-
-        // Check if the slot time is valid (approximate check, e.g., only allow entry within 30 mins of start)
-        const now = new Date();
-        const slotStart = new Date(booking.slot.startTime);
-        const slotEnd = new Date(booking.slot.endTime);
-
-        // Simple window: Allow check-in 30 mins before start until end time
-        // const diff = (now - slotStart) / 1000 / 60; // minutes
-        // if (diff < -30 || now > slotEnd) {
-        //      res.status(400);
-        //      throw new Error('Not within valid entry time window');
-        // }
-
 
         booking.status = 'attended';
         await booking.save();

@@ -17,10 +17,6 @@ const bookingSchema = mongoose.Schema(
             enum: ['confirmed', 'cancelled', 'attended', 'missed'],
             default: 'confirmed',
         },
-        qrCodeData: {
-            type: String,
-            // unique: true, // We will generate this
-        },
     },
     {
         timestamps: true,

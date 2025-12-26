@@ -19,7 +19,9 @@ app.use('/api/slots', require('./routes/slotRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Database Connection
-connectDB();
+connectDB().catch(err => {
+  console.error(`DB connection failed: ${err.message}`);
+});
 
 // Basic Route
 app.get('/', (req, res) => {

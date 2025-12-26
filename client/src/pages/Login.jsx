@@ -41,7 +41,7 @@ const Login = () => {
                 <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-secondary-100/20 rounded-full blur-[100px]"></div>
             </div>
 
-            <div className="w-full max-w-md animate-fade-in">
+            <div className="w-full max-w-md animate-fade-in-up">
                 {/* Logo area */}
                 <div className="text-center mb-8">
                     <Logo size="lg" className="justify-center mb-6" />
@@ -49,7 +49,7 @@ const Login = () => {
                     <p className="text-slate-500 mt-2">Sign in to manage your pool bookings</p>
                 </div>
 
-                <div className="glass-card !bg-white/70 p-8 rounded-[2rem] border-white/40 shadow-2xl shadow-primary-900/5">
+                <div className="glass-card motion-soft !bg-white/70 p-8 rounded-[2rem] border-white/40 shadow-2xl shadow-primary-900/5">
                     {(error || localError) && (
                         <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm flex items-center gap-3 animate-shake">
                             <span className="text-lg">⚠️</span>
@@ -119,7 +119,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full flex justify-center items-center py-4 px-4 btn-primary !text-lg !rounded-xl !shadow-primary-700/30 disabled:opacity-70 disabled:cursor-not-wait"
+                            className="w-full flex justify-center items-center py-4 px-4 btn-primary motion-soft !text-lg !rounded-xl !shadow-primary-700/30 disabled:opacity-70 disabled:cursor-not-wait"
                         >
                             {isLoading ? (
                                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

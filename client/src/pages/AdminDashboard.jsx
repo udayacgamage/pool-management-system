@@ -214,7 +214,7 @@ const AdminDashboard = () => {
                 <header className="bg-white/70 backdrop-blur-xl sticky top-0 z-30 border-b border-slate-100 px-6 lg:px-10 py-6">
                     <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
                         <div className="text-center sm:text-left mt-12 sm:mt-0">
-                            <h2 className="text-xl lg:text-2xl font-black text-slate-800 tracking-tight capitalize">{activeTab} Control</h2>
+                            <h2 className="text-xl lg:text-2xl font-black tracking-tight capitalize text-slate-800">{activeTab} Control</h2>
                             <p className="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Global Infrastructure Panel</p>
                         </div>
                         {activeTab === 'slots' && (
@@ -331,7 +331,11 @@ const AdminDashboard = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${u.role === 'admin' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-primary-50 text-primary-600 border-primary-100'}`}>
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
+                                                        u.role === 'admin' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
+                                                        u.role === 'coach' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                                        'bg-primary-50 text-primary-600 border-primary-100'
+                                                    }`}>
                                                         {u.role}
                                                     </span>
                                                 </td>

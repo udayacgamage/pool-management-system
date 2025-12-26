@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api, { getAuthHeader } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
+import { Link } from 'react-router-dom'; // Import Link
 
 const CoachDashboard = () => {
     const { user, logout } = useAuth();
@@ -36,6 +37,9 @@ const CoachDashboard = () => {
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Logo size="md" />
                     <div className="flex items-center gap-6">
+                        <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-primary-600 transition-colors">
+                            <span className="text-lg">🔍</span> Scanner
+                        </Link>
                         <div className="text-right hidden sm:block">
                             <p className="text-sm font-bold text-slate-800">{user?.name}</p>
                             <p className="text-xs font-black text-primary-600 uppercase tracking-widest">
@@ -54,7 +58,7 @@ const CoachDashboard = () => {
 
             <main className="max-w-5xl mx-auto px-6 py-12">
                 <div className="mb-10">
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Daily Roster</h1>
+                    <h1 className="text-3xl font-black tracking-tight text-slate-800">Daily Roster</h1>
                     <p className="text-slate-500 mt-2 font-medium">
                         {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>

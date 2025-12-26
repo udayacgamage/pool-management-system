@@ -23,8 +23,9 @@ const Logo = ({ className = '', size = 'md', showText = true, dark = false }) =>
                 <img src={usjLogo} alt="USJ Logo" className="w-full h-full object-contain" />
             </div>
             {showText && (
-                <span className={`${textSizes[size]} font-black tracking-tight ${dark ? 'text-white' : 'text-slate-800'}`}>
-                    USJ<span className={dark ? 'text-primary-400' : 'text-primary-600'}>POOL</span>
+                <span className={`${textSizes[size]} font-black tracking-tight`}>
+                    <span className={dark ? 'text-slate-100' : 'text-slate-900'}>USJ</span>
+                    <span className={dark ? 'text-primary-300' : 'text-primary-600'}> Pool</span>
                 </span>
             )}
         </Link>

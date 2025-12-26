@@ -16,11 +16,19 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('slots'); // 'slots' or 'bookings'
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [qrModalOpen, setQrModalOpen] = useState(false); // new
 
     useEffect(() => {
         fetchSlots();
         fetchMyBookings();
     }, []);
+
+    // Close on ESC
+    useEffect(() => {
+        const onKey = (e) => { if (e.key === 'Escape') setQrModalOpen(false); };
+        if (qrModalOpen) document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [qrModalOpen]);
 
     const fetchSlots = async () => {
         try {
@@ -197,10 +205,37 @@ const Dashboard = () => {
                         </div>
                         <div className="hidden sm:flex items-center gap-3">
                             <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
-                                <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-xl">🏆</div>
+                                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-xl">🏆</div>
                                 <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter leading-none">Status</p>
-                                    <p className="font-bold text-slate-700 uppercase">{user?.role}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Status</p>
+                                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-700 border border-slate-200">
+                                        {user?.role}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* My QR (click to enlarge) */}
+                            <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 motion-soft">
+                                <button
+                                    onClick={() => setQrModalOpen(true)}
+                                    className="bg-white p-2 rounded-xl border border-slate-200 hover:border-primary-300 active:scale-95 transition"
+                                    title="View QR"
+                                >
+                                    <QRCode value={user?.qrCode || ''} size={48} />
+                                </button>
+                                <div className="min-w-[160px]">
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1">Access Code</p>
+                                    <button
+                                        onClick={() => {
+                                            if (user?.qrCode) navigator.clipboard.writeText(user.qrCode);
+                                            setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
+                                            setTimeout(() => setSuccessMsg(''), 2000);
+                                        }}
+                                        className="text-xs font-mono font-bold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg hover:bg-primary-50 transition-colors truncate"
+                                        title={user?.qrCode || 'N/A'}
+                                    >
+                                        {user?.qrCode || 'N/A'}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -248,8 +283,11 @@ const Dashboard = () => {
                                                         const capacityPercent = (bookingCount / slot.capacity) * 100;
 
                                                         return (
-                                                            <div key={slot._id} className={`group relative bg-white rounded-3xl p-6 lg:p-8 border transition-all duration-300 ${isFull ? 'bg-slate-50 border-slate-100' : 'border-slate-100 hover:border-primary-200 hover:shadow-2xl hover:shadow-primary-900/5 hover:-translate-y-1'
-                                                                }`}>
+                                                            <div
+                                                                key={slot._id}
+                                                                className={`group relative bg-white rounded-3xl p-6 lg:p-8 border transition-all duration-300 motion-reveal motion-soft ${isFull ? 'bg-slate-50 border-slate-100' : 'border-slate-100 hover:border-primary-200 hover:shadow-2xl hover:shadow-primary-900/5 hover:-translate-y-1'}`}
+                                                                data-reveal
+                                                            >
                                                                 {isBooked && (
                                                                     <div className="absolute -top-3 -right-3 bg-emerald-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg animate-bounce z-10">
                                                                         ✓
@@ -291,10 +329,7 @@ const Dashboard = () => {
                                                                     <button
                                                                         onClick={() => handleBookSlot(slot._id)}
                                                                         disabled={isFull || slot.status !== 'open' || processing === slot._id}
-                                                                        className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isFull || slot.status !== 'open'
-                                                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                                            : 'bg-primary-700 text-white shadow-xl shadow-primary-700/20 hover:bg-primary-800'
-                                                                            }`}
+                                                                        className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all motion-soft ${isFull || slot.status !== 'open' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-primary-700 text-white shadow-xl shadow-primary-700/20 hover:bg-primary-800'}`}
                                                                     >
                                                                         {processing === slot._id ? (
                                                                             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -357,18 +392,24 @@ const Dashboard = () => {
 
                                                     {booking.status === 'confirmed' && (
                                                         <div className="bg-slate-50 p-8 lg:p-10 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-slate-100 min-w-[220px]">
-                                                            <div className="bg-white p-4 rounded-3xl shadow-xl border border-slate-100 mb-6 transition-transform group-hover:scale-105">
-                                                                <QRCode value={booking.qrCodeData || booking._id} size={110} />
-                                                            </div>
+                                                            <button
+                                                                onClick={() => setQrModalOpen(true)}
+                                                                className="bg-white p-4 rounded-3xl shadow-xl border border-slate-100 mb-6 transition-transform group-hover:scale-105 hover:border-primary-300 active:scale-95"
+                                                                title="View QR"
+                                                            >
+                                                                <QRCode value={user?.qrCode || ''} size={110} />
+                                                            </button>
                                                             <button
                                                                 onClick={() => {
-                                                                    navigator.clipboard.writeText(booking.qrCodeData || booking._id);
-                                                                    setSuccessMsg('Code copied!');
+                                                                    if (user?.qrCode) {
+                                                                        navigator.clipboard.writeText(user.qrCode);
+                                                                    }
+                                                                    setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
                                                                     setTimeout(() => setSuccessMsg(''), 2000);
                                                                 }}
                                                                 className="w-full bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-mono font-bold text-slate-600 hover:bg-primary-50 transition-all truncate"
                                                             >
-                                                                {booking.qrCodeData || booking._id}
+                                                                {user?.qrCode || 'N/A'}
                                                             </button>
                                                         </div>
                                                     )}
@@ -382,6 +423,41 @@ const Dashboard = () => {
                     )}
                 </div>
             </main>
+
+            {/* QR Modal */}
+            {qrModalOpen && (
+                <div
+                    className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6"
+                    onClick={() => setQrModalOpen(false)}
+                >
+                    <div
+                        className="bg-white rounded-3xl p-8 max-w-sm w-full text-center relative"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setQrModalOpen(false)}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+                            aria-label="Close"
+                        >
+                            ✕
+                        </button>
+                        <div className="mx-auto bg-white rounded-2xl border border-slate-200 p-6 shadow">
+                            <QRCode value={user?.qrCode || ''} size={220} />
+                        </div>
+                        <p className="mt-6 font-mono text-sm text-slate-700 break-all">{user?.qrCode || 'N/A'}</p>
+                        <button
+                            onClick={() => {
+                                if (user?.qrCode) navigator.clipboard.writeText(user.qrCode);
+                                setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
+                                setTimeout(() => setSuccessMsg(''), 1500);
+                            }}
+                            className="mt-4 px-4 py-2 rounded-xl bg-primary-700 text-white text-xs font-black uppercase tracking-widest"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -7,8 +7,8 @@ const StaffRoute = () => {
 
     if (loading) return <LoadingScreen />;
 
-    // Admin is also considered staff for simplicity
-    return user && (user.role === 'staff' || user.role === 'admin') ? <Outlet /> : <Navigate to="/dashboard" />;
+    // Allow Staff, Admin, AND Coaches to access staff routes (Scanner)
+    return user && (user.role === 'staff' || user.role === 'admin' || user.role === 'coach') ? <Outlet /> : <Navigate to="/dashboard" />;
 }
 
 export default StaffRoute;
