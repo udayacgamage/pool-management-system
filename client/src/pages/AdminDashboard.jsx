@@ -155,7 +155,7 @@ const AdminDashboard = () => {
             <aside className={`
                 ${isSidebarOpen ? 'w-72' : 'w-24'} 
                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                bg-slate-900 text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
+                bg-[#5a0000] text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
             `}>
                 <div className="p-8 border-b border-slate-800/50">
                     <Logo size="md" dark showText={isSidebarOpen} />
@@ -165,13 +165,10 @@ const AdminDashboard = () => {
                     {sideItems.map((item) => (
                         <button
                             key={item.id}
-                            onClick={() => {
-                                setActiveTab(item.id);
-                                setIsMobileMenuOpen(false);
-                            }}
+                            onClick={() => { setActiveTab(item.id); setIsMobileMenuOpen(false); }}
                             className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${activeTab === item.id
-                                ? 'bg-primary-600 text-white shadow-xl shadow-primary-900/20'
-                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                                ? 'bg-mg text-white shadow-xl'
+                                : 'text-slate-400 hover:bg-[#6a0000]/50 hover:text-white'
                                 }`}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -220,7 +217,7 @@ const AdminDashboard = () => {
                         {activeTab === 'slots' && (
                             <button
                                 onClick={() => setShowForm(!showForm)}
-                                className="w-full sm:w-auto bg-primary-600 text-white px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-600/20 hover:bg-primary-700 transition-all"
+                                className="w-full sm:w-auto btn-maroon !px-8 !py-3.5 !text-[10px] uppercase tracking-widest shadow-xl"
                             >
                                 {showForm ? '✕ Close Console' : '+ Provision Slot'}
                             </button>
@@ -232,7 +229,7 @@ const AdminDashboard = () => {
                     {/* Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                         {[
-                            { label: 'Total Users', value: stats?.users || 0, icon: '🎓', color: 'bg-primary-50 text-primary-600' },
+                            { label: 'Total Users', value: stats?.users || 0, icon: '🎓', color: 'bg-[#fff0f0] text-mg' },
                             { label: 'Bookings', value: stats?.bookings || 0, icon: '🎫', color: 'bg-emerald-50 text-emerald-700' },
                             { label: 'Attended', value: stats?.attended || 0, icon: '✅', color: 'bg-amber-50 text-amber-700' },
                             { label: 'Sessions', value: stats?.slots || 0, icon: '⚡', color: 'bg-purple-50 text-purple-700' },
@@ -269,7 +266,7 @@ const AdminDashboard = () => {
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Departure</label>
                                             <input type="time" required className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-bold text-slate-700" value={formData.endTime} onChange={(e) => setFormData({ ...formData, endTime: e.target.value })} />
                                         </div>
-                                        <button type="submit" className="w-full h-12 bg-slate-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">Authorize Session</button>
+                                        <button type="submit" className="w-full h-12 btn-maroon !rounded-xl !text-[10px] uppercase tracking-widest">Authorize Session</button>
                                     </form>
                                 </div>
                             )}
@@ -334,7 +331,7 @@ const AdminDashboard = () => {
                                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
                                                         u.role === 'admin' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                                         u.role === 'coach' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                        'bg-primary-50 text-primary-600 border-primary-100'
+                                                        'bg-[#fff0f0] text-mg border-slate-200'
                                                     }`}>
                                                         {u.role}
                                                     </span>
@@ -386,7 +383,7 @@ const AdminDashboard = () => {
                                                     <p className="text-[10px] font-black text-slate-300">{formatTime(t.startTime)}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-lg font-black text-primary-700">{Math.round((t.bookingCount / t.capacity) * 100) || 0}%</p>
+                                                    <p className="text-lg font-black text-mg">{Math.round((t.bookingCount / t.capacity) * 100) || 0}%</p>
                                                 </div>
                                             </div>
                                         ))}

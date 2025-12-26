@@ -195,7 +195,7 @@ const QRScanner = () => {
                                     className={`w-full group/btn relative h-16 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all overflow-hidden motion-soft
                                         ${loading || !qrInput
                                             ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5'
-                                            : 'bg-primary-600 text-white shadow-[0_0_30px_rgba(37,99,235,0.3)] hover:bg-primary-500 active:scale-[0.98]'
+                                            : 'btn-maroon'
                                         }
                                     `}
                                 >

@@ -31,8 +31,13 @@
 
   /* Neutral, interactive buttons */
   .btn-primary {
-    @apply px-8 py-3 rounded-2xl transition-all duration-300 font-bold shadow-xl active:scale-[0.98] tracking-tight bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20;
+    @apply px-8 py-3 rounded-2xl transition-all duration-300 font-bold shadow-xl active:scale-[0.98] tracking-tight text-white focus:outline-none focus:ring-4;
+    background-color: #800000; /* maroon */
+    box-shadow: 0 10px 24px rgba(128, 0, 0, 0.25);
+    /* maroon focus ring */
+    --tw-ring-color: rgba(128, 0, 0, 0.25);
   }
+  .btn-primary:hover { background-color: #6a0000; }
   .btn-secondary {
     @apply px-8 py-3 bg-white border rounded-2xl transition-all duration-300 font-bold shadow-sm active:scale-[0.98] tracking-tight border-slate-300 text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-300/40;
   }
@@ -78,6 +83,10 @@
   .text-gold { color: var(--gold); }
   .bg-mg { background-color: var(--mg); }
   .bg-gold { background-color: var(--gold); }
+  /* added */
+  .bg-mg-dark { background-color: var(--mg-dark); }
+  .border-mg { border-color: var(--mg); }
+  .border-mg-dark { border-color: var(--mg-dark); }
 
   /* Gold CTA (filled) */
   .btn-gold {
@@ -117,38 +126,33 @@
   .motion-soft:hover {
     transform: translateY(-1px);
   }
-}
 
-/* Respect user preference */
-@media (prefers-reduced-motion: reduce) {
-  .motion-soft,
-  .motion-reveal,
-  .hover-tilt,
-  .hover-glow,
-  [class*="animate-"] {
-    transition: none !important;
-    animation: none !important;
-    transform: none !important;
+  /* Hover text color utility */
+  .hover-text-mg:hover { color: var(--mg); }
+
+  /* Light maroon background utility */
+  .bg-mg-soft {
+    background: linear-gradient(135deg, #fff5f5 0%, #fdeaea 50%, #fbe9e9 100%);
   }
-}
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
-}
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+  }
 
-/* Selection color aligned to brand */
-::selection {
-  background: rgba(128, 0, 0, 0.12);
-}
-::-moz-selection {
-  background: rgba(128, 0, 0, 0.12);
+  /* Selection color aligned to brand */
+  ::selection {
+    background: rgba(128, 0, 0, 0.12);
+  }
+  ::-moz-selection {
+    background: rgba(128, 0, 0, 0.12);
+  }
 }

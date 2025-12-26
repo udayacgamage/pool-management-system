@@ -37,12 +37,12 @@ const CoachDashboard = () => {
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Logo size="md" />
                     <div className="flex items-center gap-6">
-                        <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-primary-600 transition-colors">
+                        <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-mg transition-colors">
                             <span className="text-lg">🔍</span> Scanner
                         </Link>
                         <div className="text-right hidden sm:block">
                             <p className="text-sm font-bold text-slate-800">{user?.name}</p>
-                            <p className="text-xs font-black text-primary-600 uppercase tracking-widest">
+                            <p className="text-xs font-black text-mg uppercase tracking-widest">
                                 {user?.specialization ? `${user.specialization} Coach` : 'Head Coach'}
                             </p>
                         </div>
@@ -72,7 +72,7 @@ const CoachDashboard = () => {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                        <div className="w-10 h-10 border-4 border-slate-200 rounded-full animate-spin" style={{ borderTopColor: 'var(--mg)' }}></div>
                     </div>
                 ) : slots.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-[2rem] border border-slate-200 border-dashed">
@@ -91,8 +91,8 @@ const CoachDashboard = () => {
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                                         <div>
                                             <div className="flex items-center gap-3 mb-1">
-                                                <span className="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></span>
-                                                <p className="text-xs font-black text-primary-600 uppercase tracking-widest">Active Session</p>
+                                                <span className="w-3 h-3 rounded-full bg-mg animate-pulse"></span>
+                                                <p className="text-xs font-black text-mg uppercase tracking-widest">Active Session</p>
                                             </div>
                                             <h3 className="text-3xl font-black text-slate-800">
                                                 {formatTime(slot.startTime)} <span className="text-slate-300 font-light">-</span> {formatTime(slot.endTime)}

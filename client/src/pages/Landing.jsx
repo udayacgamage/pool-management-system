@@ -48,6 +48,26 @@ const Landing = () => {
         })();
     }, []);
 
+    // Role-aware portal helpers
+    const getPortalRoute = (u) => {
+        if (!u) return '/login';
+        switch (u.role) {
+            case 'admin': return '/admin';
+            case 'coach': return '/coach';
+            case 'staff': return '/scanner';
+            default: return '/dashboard';
+        }
+    };
+    const getPortalLabel = (u) => {
+        if (!u) return 'Student Portal';
+        switch (u.role) {
+            case 'admin': return 'Admin Portal';
+            case 'coach': return 'Coach Portal';
+            case 'staff': return 'Gate Scanner';
+            default: return 'Student Portal';
+        }
+    };
+
     const navLinks = [
         { id: 'home', label: 'Home' },
         { id: 'specs', label: 'Infrastructure' },
@@ -59,7 +79,7 @@ const Landing = () => {
     ];
 
     return (
-        <div className="min-h-screen font-sans">
+        <div className="min-h-screen font-sans bg-mg-soft">
             {/* Navbar (glassmorphic) */}
             <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,7 +90,7 @@ const Landing = () => {
                                 <a
                                     key={link.id}
                                     href={`#${link.id}`}
-                                    className={`nav-underline motion-soft transition-colors ${activeSection === link.id ? 'text-primary-700' : 'text-slate-700 hover:text-primary-700'}`}
+                                    className={`nav-underline motion-soft transition-colors ${activeSection === link.id ? 'text-mg' : 'text-slate-700 hover-text-mg'}`}
                                     aria-current={activeSection === link.id ? 'page' : undefined}
                                 >
                                     {link.label}
@@ -89,10 +109,10 @@ const Landing = () => {
                                 ☰
                             </button>
                             <Link
-                                to={user ? "/dashboard" : "/login"}
+                                to={getPortalRoute(user)}
                                 className="btn-maroon !px-6 !py-3 motion-soft"
                             >
-                                Student Portal
+                                {getPortalLabel(user)}
                             </Link>
                         </div>
                     </div>
@@ -114,8 +134,8 @@ const Landing = () => {
                                     key={link.id}
                                     href={`#${link.id}`}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`block px-3 py-2 rounded-lg hover:bg-slate-50 ${
-                                        activeSection === link.id ? 'text-primary-700' : 'text-slate-700'
+                                    className={`block px-3 py-2 rounded-lg hover:bg-slate-50 motion-soft ${
+                                        activeSection === link.id ? 'text-mg' : 'text-slate-700 hover-text-mg'
                                     }`}
                                     aria-current={activeSection === link.id ? 'page' : undefined}
                                 >
@@ -129,7 +149,7 @@ const Landing = () => {
 
             {/* Hero: centered logo, status pill, heading */}
             <header id="home" className="relative h-[80vh] overflow-hidden flex items-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#fff5f5] via-[#fdeaea] to-[#fbe9e9]" />
                 <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
                     {/* center emblem */}
                     <div className="flex justify-center mb-6">
@@ -158,9 +178,19 @@ const Landing = () => {
                     </p>
 
                     {/* CTAs */}
-                    <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center motion-soft" data-reveal>
-                        <Link to={user ? "/dashboard" : "/login"} className="btn-maroon motion-soft !px-8 !py-4 !text-base uppercase tracking-widest">BOOK YOUR SLOT</Link>
-                        <a href="#gallery" className="btn-gold motion-soft !px-8 !py-4 !text-base uppercase tracking-widest">EXPLORE FACILITY</a>
+                    <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                        <Link
+                            to={getPortalRoute(user)}
+                            className="btn-maroon !px-8 !py-4 !text-base uppercase tracking-widest motion-soft"
+                        >
+                            {getPortalLabel(user)}
+                        </Link>
+                        <a
+                            href="#gallery"
+                            className="btn-gold !px-8 !py-4 !text-base uppercase tracking-widest motion-soft"
+                        >
+                            EXPLORE FACILITY
+                        </a>
                     </div>
                 </div>
             </header>
@@ -199,7 +229,9 @@ const Landing = () => {
                                 <p className="text-slate-600 mt-2 font-medium">Book, verify, and track attendance in one place.</p>
                             </div>
                             <div className="flex gap-3">
-                                <Link to="/dashboard" className="btn-maroon motion-soft !px-6 !py-3">Open Portal</Link>
+                                <Link to={getPortalRoute(user)} className="btn-maroon motion-soft !px-6 !py-3">
+                                    {getPortalLabel(user)}
+                                </Link>
                                 <Link to="/register" className="btn-secondary motion-soft !px-6 !py-3">Join Now</Link>
                             </div>
                         </div>

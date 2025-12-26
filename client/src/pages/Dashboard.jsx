@@ -122,7 +122,7 @@ const Dashboard = () => {
             <div className="lg:hidden fixed top-6 left-6 z-50">
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-3 bg-primary-900 text-white rounded-2xl shadow-xl border border-primary-700 active:scale-95 transition-all"
+                    className="p-3 bg-mg-dark text-white rounded-2xl shadow-xl border border-mg-dark active:scale-95 transition-all"
                 >
                     {isMobileMenuOpen ? '✕' : '☰'}
                 </button>
@@ -140,7 +140,7 @@ const Dashboard = () => {
             <aside className={`
                 ${isSidebarOpen ? 'w-72' : 'w-20'} 
                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                bg-primary-900 text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
+                bg-mg-dark text-white transition-all duration-300 flex flex-col fixed lg:sticky top-0 h-screen z-50
             `}>
                 <div className="p-6">
                     <Logo size="md" dark showText={isSidebarOpen} />
@@ -155,8 +155,8 @@ const Dashboard = () => {
                                 setIsMobileMenuOpen(false);
                             }}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
-                                ? 'bg-primary-700 text-white shadow-lg'
-                                : 'text-primary-300 hover:bg-primary-800 hover:text-white'
+                                ? 'bg-mg text-white shadow-lg'
+                                : 'text-white/70 hover:bg-[#6a0000] hover:text-white'
                                 }`}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -165,7 +165,7 @@ const Dashboard = () => {
                     ))}
                     <Link
                         to="/"
-                        className="w-full flex items-center gap-4 px-4 py-3 text-primary-300 hover:bg-primary-800 hover:text-white rounded-xl transition-all"
+                        className="w-full flex items-center gap-4 px-4 py-3 text-white/70 hover:bg-[#6a0000] hover:text-white rounded-xl transition-all"
                     >
                         <span className="text-xl">🏠</span>
                         {isSidebarOpen && <span className="font-semibold">Exit to Home</span>}
@@ -173,14 +173,14 @@ const Dashboard = () => {
                 </nav>
 
                 <div className="p-4 mt-auto">
-                    <div className={`p-4 rounded-2xl bg-primary-800/50 ${!isSidebarOpen && 'hidden'}`}>
-                        <p className="text-xs text-primary-400 uppercase font-black tracking-widest mb-1">Logged in as</p>
+                    <div className={`p-4 rounded-2xl bg-white/10 ${!isSidebarOpen && 'hidden'}`}>
+                        <p className="text-xs text-white/70 uppercase font-black tracking-widest mb-1">Logged in as</p>
                         <p className="font-bold truncate">{user?.name}</p>
-                        <p className="text-xs text-primary-400 truncate">{user?.email}</p>
+                        <p className="text-xs text-white/70 truncate">{user?.email}</p>
                     </div>
                     <button
                         onClick={logout}
-                        className="w-full mt-4 flex items-center gap-4 px-4 py-3 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 rounded-xl transition-all"
+                        className="w-full mt-4 flex items-center gap-4 px-4 py-3 text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 rounded-xl transition-all"
                     >
                         <span className="text-xl">🚪</span>
                         {isSidebarOpen && <span className="font-bold">Logout</span>}
@@ -215,10 +215,10 @@ const Dashboard = () => {
                             </div>
 
                             {/* My QR (click to enlarge) */}
-                            <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 motion-soft">
+                            <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
                                 <button
                                     onClick={() => setQrModalOpen(true)}
-                                    className="bg-white p-2 rounded-xl border border-slate-200 hover:border-primary-300 active:scale-95 transition"
+                                    className="bg-white p-2 rounded-xl border border-slate-200 hover:border-slate-300 active:scale-95 transition"
                                     title="View QR"
                                 >
                                     <QRCode value={user?.qrCode || ''} size={48} />
@@ -231,7 +231,7 @@ const Dashboard = () => {
                                             setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
                                             setTimeout(() => setSuccessMsg(''), 2000);
                                         }}
-                                        className="text-xs font-mono font-bold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg hover:bg-primary-50 transition-colors truncate"
+                                        className="text-xs font-mono font-bold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg hover:bg-slate-100 transition-colors truncate"
                                         title={user?.qrCode || 'N/A'}
                                     >
                                         {user?.qrCode || 'N/A'}
@@ -252,7 +252,10 @@ const Dashboard = () => {
 
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-96 gap-4">
-                            <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-700 rounded-full animate-spin"></div>
+                            <div
+                                className="w-12 h-12 border-4 border-slate-200 rounded-full animate-spin"
+                                style={{ borderTopColor: 'var(--mg)' }}
+                            ></div>
                             <p className="text-slate-400 font-medium">Loading your platform...</p>
                         </div>
                     ) : (
@@ -285,7 +288,7 @@ const Dashboard = () => {
                                                         return (
                                                             <div
                                                                 key={slot._id}
-                                                                className={`group relative bg-white rounded-3xl p-6 lg:p-8 border transition-all duration-300 motion-reveal motion-soft ${isFull ? 'bg-slate-50 border-slate-100' : 'border-slate-100 hover:border-primary-200 hover:shadow-2xl hover:shadow-primary-900/5 hover:-translate-y-1'}`}
+                                                                className={`group relative bg-white rounded-3xl p-6 lg:p-8 border transition-all duration-300 motion-reveal motion-soft ${isFull ? 'bg-slate-50 border-slate-100' : 'border-slate-100 hover:shadow-2xl hover:-translate-y-1'}`}
                                                                 data-reveal
                                                             >
                                                                 {isBooked && (
@@ -301,7 +304,7 @@ const Dashboard = () => {
                                                                         </p>
                                                                         <p className="text-slate-400 font-medium">To {formatTime(slot.endTime)}</p>
                                                                     </div>
-                                                                    <div className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-primary-50 text-primary-700'
+                                                                    <div className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-[#fff0f0] text-mg'
                                                                         }`}>
                                                                         {isFull ? 'Sold Out' : 'Open'}
                                                                     </div>
@@ -314,7 +317,7 @@ const Dashboard = () => {
                                                                     </div>
                                                                     <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5">
                                                                         <div
-                                                                            className={`h-full rounded-full transition-all duration-500 ${capacityPercent > 80 ? 'bg-rose-500' : capacityPercent > 50 ? 'bg-amber-500' : 'bg-primary-600'
+                                                                            className={`h-full rounded-full transition-all duration-500 ${capacityPercent > 80 ? 'bg-rose-500' : capacityPercent > 50 ? 'bg-amber-500' : 'bg-mg'
                                                                                 }`}
                                                                             style={{ width: `${capacityPercent}%` }}
                                                                         ></div>
@@ -329,7 +332,10 @@ const Dashboard = () => {
                                                                     <button
                                                                         onClick={() => handleBookSlot(slot._id)}
                                                                         disabled={isFull || slot.status !== 'open' || processing === slot._id}
-                                                                        className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all motion-soft ${isFull || slot.status !== 'open' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-primary-700 text-white shadow-xl shadow-primary-700/20 hover:bg-primary-800'}`}
+                                                                        className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all motion-soft ${isFull || slot.status !== 'open'
+                                                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                                                            : 'btn-maroon'
+                                                                            }`}
                                                                     >
                                                                         {processing === slot._id ? (
                                                                             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -355,12 +361,12 @@ const Dashboard = () => {
                                             <div className="text-6xl mb-6">📦</div>
                                             <h3 className="text-2xl font-bold text-slate-800">No bookings yet!</h3>
                                             <p className="text-slate-500 mt-2 mb-10">Historical and upcoming reservations will appear here.</p>
-                                            <button onClick={() => setActiveTab('slots')} className="bg-primary-700 text-white px-8 py-3.5 rounded-2xl font-bold">Find Slots</button>
+                                            <button onClick={() => setActiveTab('slots')} className="btn-maroon px-8 py-3.5 rounded-2xl font-bold">Find Slots</button>
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                                             {myBookings.map((booking) => (
-                                                <div key={booking._id} className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row border transition-all duration-300 hover:shadow-2xl hover:shadow-primary-900/5 ${booking.status === 'cancelled' ? 'opacity-60 grayscale-[0.5]' : 'border-slate-100'
+                                                <div key={booking._id} className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row border transition-all duration-300 hover:shadow-2xl ${booking.status === 'cancelled' ? 'opacity-60 grayscale-[0.5]' : 'border-slate-100'
                                                     }`}>
                                                     <div className="p-8 lg:p-10 flex-1 flex flex-col">
                                                         <div className="flex items-center justify-between mb-8">
@@ -371,7 +377,7 @@ const Dashboard = () => {
                                                         </div>
 
                                                         <div className="mb-auto">
-                                                            <p className="text-[10px] font-black text-primary-700 uppercase tracking-widest mb-1">Schedule</p>
+                                                            <p className="text-[10px] font-black text-mg uppercase tracking-widest mb-1">Schedule</p>
                                                             <p className="text-xl lg:text-2xl font-black text-slate-800 leading-tight">
                                                                 {booking.slot ? formatDate(booking.slot.startTime) : 'Archived Slot'}
                                                             </p>
@@ -394,7 +400,7 @@ const Dashboard = () => {
                                                         <div className="bg-slate-50 p-8 lg:p-10 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-slate-100 min-w-[220px]">
                                                             <button
                                                                 onClick={() => setQrModalOpen(true)}
-                                                                className="bg-white p-4 rounded-3xl shadow-xl border border-slate-100 mb-6 transition-transform group-hover:scale-105 hover:border-primary-300 active:scale-95"
+                                                                className="bg-white p-4 rounded-3xl shadow-xl border border-slate-100 mb-6 transition-transform group-hover:scale-105 hover:border-slate-300 active:scale-95"
                                                                 title="View QR"
                                                             >
                                                                 <QRCode value={user?.qrCode || ''} size={110} />
@@ -407,7 +413,7 @@ const Dashboard = () => {
                                                                     setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
                                                                     setTimeout(() => setSuccessMsg(''), 2000);
                                                                 }}
-                                                                className="w-full bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-mono font-bold text-slate-600 hover:bg-primary-50 transition-all truncate"
+                                                                className="w-full bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-mono font-bold text-slate-600 hover:bg-slate-100 transition-all truncate"
                                                             >
                                                                 {user?.qrCode || 'N/A'}
                                                             </button>
@@ -451,7 +457,7 @@ const Dashboard = () => {
                                 setSuccessMsg(user?.qrCode ? 'Code copied!' : 'No QR available');
                                 setTimeout(() => setSuccessMsg(''), 1500);
                             }}
-                            className="mt-4 px-4 py-2 rounded-xl bg-primary-700 text-white text-xs font-black uppercase tracking-widest"
+                            className="mt-4 px-4 py-2 rounded-xl btn-primary text-xs font-black uppercase tracking-widest"
                         >
                             Copy
                         </button>
