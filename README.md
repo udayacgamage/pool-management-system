@@ -61,9 +61,9 @@ npm install
 # # Email Configuration (Gmail App Password)
 # SMTP_HOST=smtp.gmail.com
 # SMTP_PORT=587
-# SMTP_USER=your_email@gmail.com
-# SMTP_PASS=your_app_password
-# SMTP_EMAIL=your_email@gmail.com
+# SMTP_USER=usjppool@gmail.com
+# SMTP_PASS=ihnpdwqzlvyqiegf
+# SMTP_EMAIL=usjppool@gmail.com
 
 # Seed Admin & Data
 node create_admin.js
