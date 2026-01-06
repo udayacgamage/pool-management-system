@@ -22,6 +22,18 @@ app.use(express.json());
 // Health Check (No DB required)
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 
+// Database Connection Middleware (Must run before routes)
+// Ensures handlers don't execute before MongoDB is connected.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error(`DB Connection Error: ${error.message}`);
+    res.status(500).json({ error: 'Database connection failed', details: error.message });
+  }
+});
+
 // Serve static files (Check if exists first to avoid crashes)
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, '/uploads');
@@ -37,17 +49,6 @@ app.use('/api/notices', require('./routes/noticeRoutes'));
 app.use('/api/holidays', require('./routes/holidayRoutes'));
 app.use('/api/coach-allocations', require('./routes/coachRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
-
-// Database Connection Middleware (Better for Vercel/Serverless)
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error(`DB Connection Error: ${error.message}`);
-    res.status(500).json({ error: 'Database connection failed', details: error.message });
-  }
-});
 
 /* 
 // Old connection method - disabled for serverless stability

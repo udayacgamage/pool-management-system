@@ -19,6 +19,15 @@ const createBooking = async (req, res) => {
             res.status(404);
             throw new Error('Slot not found');
         }
+
+        // Block bookings once the slot has started
+        const now = new Date();
+        const slotStart = new Date(slot.startTime);
+        if (now >= slotStart) {
+            res.status(400);
+            throw new Error('This slot has already started and can no longer be booked');
+        }
+
         // Check if date is a Holiday
         const slotDate = new Date(slot.startTime);
         slotDate.setHours(0, 0, 0, 0);

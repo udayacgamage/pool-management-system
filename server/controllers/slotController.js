@@ -12,7 +12,8 @@ const getSlots = async (req, res) => {
         let targetDate = new Date();
 
         if (req.query.date) {
-            targetDate = new Date(req.query.date);
+            // Interpret YYYY-MM-DD as a local date (not UTC) to avoid off-by-one issues.
+            targetDate = new Date(`${req.query.date}T00:00:00`);
         }
 
         // Set range for the target date (00:00 to 23:59)
@@ -24,8 +25,7 @@ const getSlots = async (req, res) => {
         const slots = await Slot.find({
             startTime: { $gte: targetDate, $lt: nextDay }
         })
-            .sort({ startTime: 1 })
-            .populate('bookings', 'id'); // We only need count, not details
+            .sort({ startTime: 1 });
 
         res.status(200).json(slots);
     } catch (error) {
@@ -41,7 +41,8 @@ const getCoachSlots = async (req, res) => {
         let targetDate = new Date();
 
         if (req.query.date) {
-            targetDate = new Date(req.query.date);
+            // Interpret YYYY-MM-DD as a local date (not UTC) to avoid off-by-one issues.
+            targetDate = new Date(`${req.query.date}T00:00:00`);
         }
 
         targetDate.setHours(0, 0, 0, 0);

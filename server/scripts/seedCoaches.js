@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const path = require('path');
 const User = require('../models/User');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const coaches = [
     {
@@ -44,6 +45,9 @@ const coaches = [
 
 const seedCoaches = async () => {
     try {
+        if (!process.env.MONGO_URI) {
+            throw new Error('MONGO_URI is not set. Check server/.env');
+        }
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected for Seeding...');
 

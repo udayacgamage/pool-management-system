@@ -181,6 +181,12 @@ const Landing = () => {
             {/* Hero: centered logo, status pill, heading */}
             <header id="home" className="relative h-[80vh] overflow-hidden flex items-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#fff5f5] via-[#fdeaea] to-[#fbe9e9]" />
+                <img
+                    src={poolView}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none select-none"
+                />
                 <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
                     {/* center emblem */}
                     <div className="flex justify-center mb-6">

@@ -9,7 +9,10 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const verifyCredentials = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('Using Database:', process.env.MONGO_URI);
+        const safeUri = process.env.MONGO_URI
+            ? process.env.MONGO_URI.replace(/\/\/([^@]+)@/, '//***:***@')
+            : '';
+        console.log('Using Database:', safeUri);
 
         // Read credentials.json from project root
         const credsPath = path.join(__dirname, '../../credentials.json');

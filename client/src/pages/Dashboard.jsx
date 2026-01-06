@@ -35,6 +35,13 @@ const Dashboard = () => {
     const unreadCount = notices.filter(n => !readNotices.includes(n._id)).length;
     const qrRef = useRef(null); // Ref for Digital ID
 
+    const toYMD = (d) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
     const markAllNoticesRead = () => {
         if (notices.length === 0) return;
         const allIds = notices.map(n => n._id);
@@ -93,7 +100,8 @@ const Dashboard = () => {
 
     const fetchSlots = async (date) => {
         try {
-            const dateStr = date.toISOString().split('T')[0];
+            // Use local date, not UTC, to avoid off-by-one issues in timezones ahead of UTC.
+            const dateStr = toYMD(date);
             const config = { headers: getAuthHeader() };
             const response = await api.get(`/slots?date=${dateStr}`, config);
             setSlots(response.data);
@@ -206,9 +214,9 @@ const Dashboard = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         if (date < today) return true;
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = toYMD(date);
         const isHoliday = holidays.some(h => {
-            const hDate = new Date(h.date).toISOString().split('T')[0];
+            const hDate = toYMD(new Date(h.date));
             return hDate === dateString;
         });
         return isHoliday;
@@ -442,6 +450,7 @@ const Dashboard = () => {
                                                     {slots.map((slot) => {
                                                         const isFull = slot.remainingSpots <= 0;
                                                         const isBooked = myBookings.some(b => b.slot && b.slot._id === slot._id && b.status !== 'cancelled');
+                                                        const isStarted = new Date(slot.startTime) <= new Date();
                                                         const bookingCount = slot.bookings?.length || 0;
                                                         const capacityPercent = (bookingCount / slot.capacity) * 100;
 
@@ -450,13 +459,13 @@ const Dashboard = () => {
                                                                 {isBooked && (<div className="absolute -top-3 -right-3 bg-emerald-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg animate-bounce z-10">✓</div>)}
                                                                 <div className="flex justify-between items-start mb-6">
                                                                     <div><p className="text-2xl lg:text-3xl font-black text-slate-800">{formatTime(slot.startTime)}</p><p className="text-slate-400 font-medium">To {formatTime(slot.endTime)}</p></div>
-                                                                    <div className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-[#fff0f0] text-mg'}`}>{isFull ? 'Sold Out' : 'Open'}</div>
+                                                                    <div className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isFull ? 'bg-rose-100 text-rose-600' : isStarted ? 'bg-slate-100 text-slate-500' : 'bg-[#fff0f0] text-mg'}`}>{isFull ? 'Sold Out' : isStarted ? 'Closed' : 'Open'}</div>
                                                                 </div>
                                                                 <div className="mb-8">
                                                                     <div className="flex justify-between text-[10px] font-black text-slate-400 mb-2 uppercase tracking-tighter"><span>Occupancy</span><span>{bookingCount} / {slot.capacity}</span></div>
                                                                     <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5"><div className={`h-full rounded-full transition-all duration-500 ${capacityPercent > 80 ? 'bg-rose-500' : capacityPercent > 50 ? 'bg-amber-500' : 'bg-mg'}`} style={{ width: `${capacityPercent}%` }}></div></div>
                                                                 </div>
-                                                                {isBooked ? (<button disabled className="w-full py-4 rounded-2xl bg-emerald-50 text-emerald-600 font-black text-xs uppercase tracking-widest border border-emerald-100">Confirmed</button>) : (<button onClick={() => handleBookSlot(slot._id)} disabled={isFull || slot.status !== 'open' || processing === slot._id} className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all motion-soft ${isFull || slot.status !== 'open' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'btn-maroon'}`}>{processing === slot._id ? (<span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>) : ('Reserve Lane')}</button>)}
+                                                                {isBooked ? (<button disabled className="w-full py-4 rounded-2xl bg-emerald-50 text-emerald-600 font-black text-xs uppercase tracking-widest border border-emerald-100">Confirmed</button>) : (<button onClick={() => handleBookSlot(slot._id)} disabled={isFull || isStarted || slot.status !== 'open' || processing === slot._id} className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all motion-soft ${isFull || isStarted || slot.status !== 'open' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'btn-maroon'}`}>{processing === slot._id ? (<span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>) : ('Reserve Lane')}</button>)}
                                                             </div>
                                                         );
                                                     })}
