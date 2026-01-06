@@ -1,3 +1,4 @@
+// Server Entry Point - Updated for Vercel Deployment
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -17,6 +18,9 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Health Check (No DB required)
+app.get('/ping', (req, res) => res.status(200).send('pong'));
 
 // Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

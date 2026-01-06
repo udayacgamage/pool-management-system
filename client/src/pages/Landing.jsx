@@ -18,6 +18,27 @@ const Landing = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
     const [activeSection, setActiveSection] = React.useState('home'); // new
 
+    // Contact Form State
+    const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
+    const [status, setStatus] = React.useState({ loading: false, success: null, error: null });
+
+    const handleInputChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleContactSubmit = async (e) => {
+        e.preventDefault();
+        setStatus({ loading: true, success: null, error: null });
+
+        try {
+            await api.post('/contact', formData);
+            setStatus({ loading: false, success: 'Message sent successfully!', error: null });
+            setFormData({ name: '', email: '', message: '' });
+        } catch (err) {
+            setStatus({ loading: false, success: null, error: err.response?.data?.message || 'Failed to send message.' });
+        }
+    };
+
     // Scrollspy: track which section is in view
     React.useEffect(() => {
         const ids = ['home', 'specs', 'about', 'gallery', 'features', 'coaches', 'contact'];
@@ -444,26 +465,59 @@ const Landing = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="bg-white p-6 rounded-lg shadow-md">
                                 <h3 className="text-xl font-bold mb-4">Contact Details</h3>
-                                <p className="text-slate-700 mb-2"><strong>Email:</strong> info@sjp.ac.lk</p>
-                                <p className="text-slate-700 mb-2"><strong>Phone:</strong> +94 11 2758000,</p>
-                                <p className="text-slate-700"><strong>Address:</strong> University of Sri Jayewardenepura,  Gangodawila,Nugegoda,Sri Lanka</p>
+                                <p className="text-slate-700 mb-2"><strong>Email:</strong> usjppool@gmail.com</p>
+                                <p className="text-slate-700 mb-2"><strong>Phone:</strong> +94 11 2758000</p>
+                                <p className="text-slate-700"><strong>Address:</strong> University of Sri Jayewardenepura, Gangodawila, Nugegoda, Sri Lanka</p>
                             </div>
                             <div className="bg-white p-6 rounded-lg shadow-md">
                                 <h3 className="text-xl font-bold mb-4">Send Us a Message</h3>
-                                <form action="#" method="POST" className="space-y-4">
+                                <form onSubmit={handleContactSubmit} className="space-y-4">
+                                    {status.success && <p className="text-green-600 font-bold bg-green-50 p-2 rounded">{status.success}</p>}
+                                    {status.error && <p className="text-red-600 font-bold bg-red-50 p-2 rounded">{status.error}</p>}
+
                                     <div>
                                         <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">Your Name</label>
-                                        <input type="text" name="name" id="name" required className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600" />
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                                        />
                                     </div>
                                     <div>
                                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Your Email</label>
-                                        <input type="email" name="email" id="email" required className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600" />
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            id="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                                        />
                                     </div>
                                     <div>
                                         <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-1">Your Message</label>
-                                        <textarea name="message" id="message" rows="4" required className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600" />
+                                        <textarea
+                                            name="message"
+                                            id="message"
+                                            rows="4"
+                                            value={formData.message}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="block w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                                        />
                                     </div>
-                                    <button type="submit" className="w-full btn-maroon motion-soft !px-6 !py-3 !text-sm sm:!text-base uppercase tracking-[0.2em]">Send Message</button>
+                                    <button
+                                        type="submit"
+                                        disabled={status.loading}
+                                        className="w-full btn-maroon motion-soft !px-6 !py-3 !text-sm sm:!text-base uppercase tracking-[0.2em] disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {status.loading ? 'Sending...' : 'Send Message'}
+                                    </button>
                                 </form>
                             </div>
                         </div>

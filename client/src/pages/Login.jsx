@@ -41,6 +41,17 @@ const Login = () => {
                 <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-secondary-100/20 rounded-full blur-[100px]"></div>
             </div>
 
+            {/* Back to Home Button */}
+            <Link 
+                to="/" 
+                className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-slate-500 hover:text-primary-700 transition-all duration-300 bg-white/40 hover:bg-white/80 backdrop-blur-md px-4 py-2.5 rounded-full shadow-sm hover:shadow-md group z-20"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span className="font-semibold text-sm">Back to Home</span>
+            </Link>
+
             <div className="w-full max-w-md animate-fade-in-up">
                 {/* Logo area */}
                 <div className="text-center mb-8">
