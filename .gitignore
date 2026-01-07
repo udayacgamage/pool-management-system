@@ -30,3 +30,6 @@ build/
 
 # Runtime uploads
 server/uploads/
+
+credentials.json
+

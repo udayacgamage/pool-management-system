@@ -11,35 +11,40 @@ const coaches = [
         email: 'coach.kithsiri@sjp.ac.lk',
         password: 'Password@123',
         role: 'coach',
-        specialization: 'Head Coach'
+        specialization: 'Head Coach',
+        schedule: 'Mon - Fri'
     },
     {
         name: 'Waruni Liyanage',
         email: 'coach.waruni@sjp.ac.lk',
         password: 'Password@123',
         role: 'coach',
-        specialization: 'Swimming Instructor'
+        specialization: 'Swimming Instructor',
+        schedule: 'Mondays'
     },
     {
         name: 'Banula Devapriya',
         email: 'coach.banula@sjp.ac.lk',
         password: 'Password@123',
         role: 'coach',
-        specialization: 'Swimming Instructor'
+        specialization: 'Swimming Instructor',
+        schedule: 'Tuesdays'
     },
     {
         name: 'Vihara Jayathilaka',
         email: 'coach.vihara@sjp.ac.lk',
         password: 'Password@123',
         role: 'coach',
-        specialization: 'Swimming Instructor'
+        specialization: 'Swimming Instructor',
+        schedule: 'Wednesdays'
     },
     {
         name: 'Amadhi Kiripitige',
         email: 'coach.amadhi@sjp.ac.lk',
         password: 'Password@123',
         role: 'coach',
-        specialization: 'Swimming Instructor'
+        specialization: 'Swimming Instructor',
+        schedule: 'Thu - Fri'
     }
 ];
 
@@ -61,6 +66,7 @@ const seedCoaches = async () => {
                 existingUser.name = coach.name;
                 existingUser.role = coach.role;
                 existingUser.specialization = coach.specialization;
+                existingUser.schedule = coach.schedule;
                 // Note: We are NOT re-hashing/setting password here to avoid accidental overrides if they changed it.
                 // But if you want to FORCE reset, uncomment below:
                 existingUser.password = coach.password;

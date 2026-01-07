@@ -35,6 +35,9 @@ export const deleteAllocation = (id) => api.delete(`/coach-allocations/${id}`, {
 
 export const getCoaches = () => api.get('/auth/coaches'); // Public
 
+// Coach profile helpers
+export const updateCoachProfile = (data) => api.put('/auth/coach-profile', data, { headers: getAuthHeader() });
+
 // Upload Helper
 export const uploadProfilePic = (formData) => api.post('/auth/upload', formData, {
     headers: {
