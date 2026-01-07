@@ -62,7 +62,7 @@ npm install
 # SMTP_HOST=smtp.gmail.com
 # SMTP_PORT=587
 # SMTP_USER=usjppool@gmail.com
-# SMTP_PASS=ihnpdwqzlvyqiegf
+# SMTP_PASS=your_gmail_app_password
 # SMTP_EMAIL=usjppool@gmail.com
 
 # Seed Admin & Data
