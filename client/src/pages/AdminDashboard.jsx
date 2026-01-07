@@ -11,7 +11,7 @@ import Logo from '../components/Logo';
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
     // Data States
-    const [slots, setSlots] = useState([]);
+
     const [users, setUsers] = useState([]);
     const [stats, setStats] = useState(null);
     const [holidays, setHolidays] = useState([]);
@@ -20,7 +20,7 @@ const AdminDashboard = () => {
     const [coaches, setCoaches] = useState([]);
 
     // UI States
-    const [activeTab, setActiveTab] = useState('slots'); // 'slots', 'users', 'reports', 'holidays', 'notices', 'allocation'
+    const [activeTab, setActiveTab] = useState('users'); // 'users', 'reports', 'holidays', 'notices', 'allocation'
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMsg, setSuccessMsg] = useState('');
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Form States
-    const [slotForm, setSlotForm] = useState({ date: '', startTime: '', endTime: '', capacity: 30 });
+
     const [holidayForm, setHolidayForm] = useState({ date: '', description: '', type: 'Holiday' });
     const [noticeForm, setNoticeForm] = useState({ title: '', content: '', type: 'General' });
     const [allocationForm, setAllocationForm] = useState({ date: '', coachId: '' });
@@ -41,7 +41,7 @@ const AdminDashboard = () => {
     const refreshData = async () => {
         setLoading(true);
         try {
-            if (activeTab === 'slots') await fetchSlots();
+
             if (activeTab === 'users') await fetchUsers();
             if (activeTab === 'reports') await fetchStats();
             if (activeTab === 'holidays') await fetchHolidays();
@@ -59,10 +59,7 @@ const AdminDashboard = () => {
     };
 
     // --- Fetch Helpers ---
-    const fetchSlots = async () => {
-        const res = await api.get('/slots', { headers: getAuthHeader() });
-        setSlots(res.data);
-    };
+
     const fetchUsers = async () => {
         const res = await api.get('/auth/users', { headers: getAuthHeader() });
         setUsers(res.data);
@@ -117,22 +114,10 @@ const AdminDashboard = () => {
     };
 
     // Specific Submit Handlers
-    const submitSlot = (e) => {
-        const start = new Date(`${slotForm.date}T${slotForm.startTime}`);
-        const end = new Date(`${slotForm.date}T${slotForm.endTime}`);
-        if (start >= end) return setError('Invalid time range');
 
-        handleFormSubmit(
-            e,
-            (d) => api.post('/slots', d, { headers: getAuthHeader() }),
-            { startTime: start, endTime: end, capacity: slotForm.capacity },
-            'Slot created',
-            () => setSlotForm({ date: '', startTime: '', endTime: '', capacity: 30 })
-        );
-    };
 
     const sideItems = [
-        { id: 'slots', label: 'Slot Registry', icon: '🏊' },
+
         { id: 'users', label: 'User Control', icon: '👤' },
         { id: 'reports', label: 'Audit Reports', icon: '📈' },
         { id: 'holidays', label: 'Holidays', icon: '📅' },
@@ -142,7 +127,7 @@ const AdminDashboard = () => {
     const formatDate = (d) => new Date(d).toLocaleDateString();
 
     return (
-        <div className="h-screen w-screen bg-[#fafbfc] flex font-sans overflow-hidden">
+        <div className="h-[100dvh] md:h-screen w-screen bg-[#fafbfc] flex font-sans overflow-hidden">
             {/* Mobile Menu Button (move to right) */}
             <div className="lg:hidden fixed top-6 right-6 z-50">
                 <button
@@ -203,7 +188,7 @@ const AdminDashboard = () => {
                         <h2 className="text-2xl font-black text-slate-800 tracking-tight capitalize">{activeTab} Manager</h2>
                         <p className="text-slate-400 text-xs font-medium uppercase tracking-widest italic">System Administration</p>
                     </div>
-                    {['slots', 'holidays', 'notices', 'allocation'].includes(activeTab) && (
+                    {['holidays', 'notices', 'allocation'].includes(activeTab) && (
                         <button onClick={() => setShowForm(!showForm)} className="btn-maroon px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg">
                             {showForm ? 'Close Form' : '+ Add New'}
                         </button>
@@ -221,23 +206,7 @@ const AdminDashboard = () => {
                 {/* --- FORMS --- */}
                 {showForm && (
                     <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl mb-10 animate-fade-in">
-                        {activeTab === 'slots' && (
-                            <form onSubmit={submitSlot} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                                <label className="block space-y-2">
-                                    <span className="text-xs font-bold text-slate-400 uppercase">Date</span>
-                                    <input type="date" required className="w-full input-field" value={slotForm.date} onChange={e => setSlotForm({ ...slotForm, date: e.target.value })} />
-                                </label>
-                                <label className="block space-y-2">
-                                    <span className="text-xs font-bold text-slate-400 uppercase">Start</span>
-                                    <input type="time" required className="w-full input-field" value={slotForm.startTime} onChange={e => setSlotForm({ ...slotForm, startTime: e.target.value })} />
-                                </label>
-                                <label className="block space-y-2">
-                                    <span className="text-xs font-bold text-slate-400 uppercase">End</span>
-                                    <input type="time" required className="w-full input-field" value={slotForm.endTime} onChange={e => setSlotForm({ ...slotForm, endTime: e.target.value })} />
-                                </label>
-                                <button type="submit" className="btn-maroon h-12 rounded-xl text-xs font-bold uppercase">Deploy Slot</button>
-                            </form>
-                        )}
+
 
                         {activeTab === 'holidays' && (
                             <form onSubmit={(e) => handleFormSubmit(e, createHoliday, holidayForm, 'Holiday Added', () => setHolidayForm({ date: '', description: '', type: 'Holiday' }))} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
@@ -300,7 +269,7 @@ const AdminDashboard = () => {
                 {/* --- DATA LISTS --- */}
                 {/* --- DATA LISTS --- */}
                 {activeTab === 'holidays' && (
-                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-slate-50"><tr className="text-left text-xs uppercase text-slate-400 font-bold"><th className="p-6">Date</th><th className="p-6">Reason</th><th className="p-6 text-right">Action</th></tr></thead>
                             <tbody className="divide-y divide-slate-100">
@@ -332,79 +301,144 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === 'reports' && stats && (
-                    <div className="space-y-8">
-                        {/* Key Metrics */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center">
-                                <div className="text-4xl mb-2">👥</div>
-                                <div className="text-3xl font-black text-slate-800">{stats.users}</div>
-                                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total Users</div>
+                    <div className="space-y-8 animate-fade-in">
+                        {/* Top KPIs Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between h-40">
+                                <div>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-1">Total Users</p>
+                                    <div className="text-3xl font-black text-slate-800">{stats.users}</div>
+                                </div>
+                                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-xl">👥</div>
                             </div>
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center">
-                                <div className="text-4xl mb-2">🔖</div>
-                                <div className="text-3xl font-black text-slate-800">{stats.bookings}</div>
-                                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total Bookings</div>
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between h-40">
+                                <div>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-1">Total Bookings</p>
+                                    <div className="text-3xl font-black text-slate-800">{stats.bookings}</div>
+                                </div>
+                                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-xl">🔖</div>
                             </div>
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center">
-                                <div className="text-4xl mb-2">✅</div>
-                                <div className="text-3xl font-black text-emerald-500">{stats.attended}</div>
-                                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Attended</div>
-                            </div>
-                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-center">
-                                <div className="text-4xl mb-2">🚫</div>
-                                <div className="text-3xl font-black text-rose-500">{stats.cancelled}</div>
-                                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Cancelled</div>
+
+
+                            {/* No-Show Health Gauge */}
+                            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between relative overflow-hidden">
+                                <div>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-1">Missed Bookings</p>
+                                    <div className="text-4xl font-black text-slate-800">{stats.noShowRate || 0}%</div>
+                                    <p className="text-[10px] font-bold text-slate-400 mt-1">{stats.noShowCount || 0} people didn't come</p>
+                                </div>
+                                <div className="relative w-24 h-24 flex items-center justify-center">
+                                    <svg className="w-full h-full transform -rotate-90">
+                                        <circle cx="48" cy="48" r="36" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
+                                        <circle cx="48" cy="48" r="36" stroke="currentColor" strokeWidth="8" fill="transparent"
+                                            className={`${stats.noShowRate > 20 ? 'text-rose-500' : stats.noShowRate > 10 ? 'text-amber-500' : 'text-emerald-500'} transition-all duration-1000 ease-out`}
+                                            strokeDasharray={226}
+                                            strokeDashoffset={226 - (226 * (stats.noShowRate || 0)) / 100}
+                                        />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 
-                        {/* High Occupancy Slots */}
-                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                            <h3 className="text-lg font-black text-slate-800 mb-6 uppercase tracking-tight">🔥 Trending Slots</h3>
-                            <div className="space-y-4">
-                                {stats.trends && stats.trends.length > 0 ? (
-                                    stats.trends.map((t, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                                            <div>
-                                                <p className="font-bold text-slate-700">{formatDate(t.startTime)}</p>
-                                                <p className="text-xs text-slate-400">{new Date(t.startTime).toLocaleTimeString([], { timeStyle: 'short' })} - {new Date(t.endTime).toLocaleTimeString([], { timeStyle: 'short' })}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-xl font-black text-mg">{t.bookingCount}</span>
-                                                <span className="text-xs font-bold text-slate-400">/{t.capacity}</span>
-                                            </div>
+                        {/* Middle Row: Heat Map & Top No-Showers */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                            {/* Peak Hours Heat Map */}
+                            <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Weekly Crowd Pattern</h3>
+                                        <p className="text-xs text-slate-400 font-medium">Shows which times are usually busy (Red) or quiet (Blue)</p>
+                                    </div>
+                                    <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-100"></span> Empty</span>
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Moderate</span>
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500"></span> Busy</span>
+                                    </div>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    {/* Grid Container */}
+                                    <div className="min-w-[600px]">
+                                        {/* Header Row (Days) */}
+                                        <div className="grid grid-cols-6 gap-1 mb-1">
+                                            <div className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Hour</div>
+                                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map(d => (
+                                                <div key={d} className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{d}</div>
+                                            ))}
                                         </div>
-                                    ))
-                                ) : (
-                                    <p className="text-slate-400 text-sm">No sufficient data for trends yet.</p>
-                                )}
+
+                                        {/* Hour Rows */}
+                                        {Array.from({ length: 14 }, (_, i) => i + 6).map(hour => ( // 6 AM to 7 PM range
+                                            <div key={hour} className="grid grid-cols-6 gap-1 mb-1 items-center">
+                                                <div className="text-[10px] font-mono text-slate-400 text-center">
+                                                    {hour > 12 ? hour - 12 : hour} {hour >= 12 ? 'PM' : 'AM'}
+                                                </div>
+                                                {[2, 3, 4, 5, 6].map(day => {
+                                                    // Find data for this cell
+                                                    const cellData = stats.heatMap?.find(d => d.day === day && d.hour === hour);
+                                                    const occupancy = cellData ? cellData.occupancyPercent : 0;
+
+                                                    // Color Logic
+                                                    let bgClass = 'bg-slate-50'; // Default empty
+                                                    if (occupancy > 0) bgClass = 'bg-blue-100';
+                                                    if (occupancy > 25) bgClass = 'bg-blue-300';
+                                                    if (occupancy > 50) bgClass = 'bg-blue-500';
+                                                    if (occupancy > 75) bgClass = 'bg-orange-400';
+                                                    if (occupancy > 90) bgClass = 'bg-rose-500';
+
+                                                    return (
+                                                        <div key={`${day}-${hour}`} className="relative group h-8">
+                                                            <div className={`w-full h-full rounded-md ${bgClass} transition-all hover:scale-105 cursor-pointer`}></div>
+                                                            {/* Tooltip */}
+                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-800 text-white text-[10px] font-bold p-2 rounded-lg whitespace-nowrap z-10 shadow-xl pointer-events-none">
+                                                                {occupancy.toFixed(0)}% Capacity
+                                                                <br />
+                                                                {cellData?.avgBookings?.toFixed(1) || 0} avg patrons
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Top No-Showers List */}
+                            <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                                <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">⚠️ Top No-Showers</h3>
+                                <div className="space-y-4">
+                                    {stats.topNoShowers && stats.topNoShowers.length > 0 ? (
+                                        stats.topNoShowers.map((user, idx) => (
+                                            <div key={idx} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                                <div className="w-10 h-10 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500">
+                                                    {user.name.charAt(0)}
+                                                </div>
+                                                <div className="flex-1 overflow-hidden">
+                                                    <p className="font-bold text-slate-800 truncate">{user.name}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.count} Missed Sessions</p>
+                                                </div>
+                                                <button onClick={() => alert(`Ideally send email to ${user.email}`)} className="text-xs font-black text-blue-500 uppercase hover:underline">
+                                                    Notify
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-10 text-slate-400">
+                                            <p className="text-4xl mb-2">🎉</p>
+                                            <p className="text-sm font-bold">Everyone showed up!</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Keep existing Slots and Users views roughly as they were, just simplified for length */}
-                {activeTab === 'slots' && !showForm && (
-                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-slate-50"><tr className="text-left text-xs uppercase text-slate-400 font-bold"><th className="p-6">Date</th><th className="p-6">Time</th><th className="p-6">Capacity</th><th className="p-6 text-right">Action</th></tr></thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {slots.map(s => (
-                                    <tr key={s._id} className="hover:bg-slate-50">
-                                        <td className="p-6 font-bold text-slate-700">{formatDate(s.startTime)}</td>
-                                        <td className="p-6 text-sm">{new Date(s.startTime).toLocaleTimeString([], { timeStyle: 'short' })} - {new Date(s.endTime).toLocaleTimeString([], { timeStyle: 'short' })}</td>
-                                        <td className="p-6 text-sm flex items-center gap-2">
-                                            <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-mg" style={{ width: `${(s.bookings.length / s.capacity) * 100}%` }}></div></div>
-                                            {s.bookings.length}/{s.capacity}
-                                        </td>
-                                        <td className="p-6 text-right"><button onClick={() => handleDelete((id) => api.delete(`/slots/${id}`, { headers: getAuthHeader() }), s._id, 'Slot deleted')} className="text-rose-500 font-bold text-xs uppercase">Delete</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+
                 {activeTab === 'users' && (
-                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-slate-50"><tr className="text-left text-xs uppercase text-slate-400 font-bold"><th className="p-6">Name</th><th className="p-6">Role</th><th className="p-6 text-right">Action</th></tr></thead>
                             <tbody className="divide-y divide-slate-100">

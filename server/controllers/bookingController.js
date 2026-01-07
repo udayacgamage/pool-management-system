@@ -294,7 +294,81 @@ const getStats = async (req, res) => {
         const cancelledBookings = await Booking.countDocuments({ status: 'cancelled' });
         const totalSlots = await Slot.countDocuments({});
 
-        // Use aggregation to sort by bookings length
+        // --- NO-SHOW CALCULATIONS ---
+        // Definition: Status is 'confirmed' (not attended/cancelled) AND slot has ended in the past
+        const now = new Date();
+        const noShows = await Booking.find({
+            status: 'confirmed'
+        }).populate({
+            path: 'slot',
+            match: { endTime: { $lt: now } }
+        });
+
+        // Filter out bookings where slot is null (future slots or didn't match time)
+        const validNoShows = noShows.filter(b => b.slot !== null);
+        const noShowCount = validNoShows.length;
+        const noShowRate = totalBookings > 0 ? ((noShowCount / totalBookings) * 100).toFixed(1) : 0;
+
+        // Top No-Showers
+        const noShowUserCounts = {};
+        validNoShows.forEach(b => {
+            if (b.user) {
+                noShowUserCounts[b.user] = (noShowUserCounts[b.user] || 0) + 1;
+            }
+        });
+
+        // Convert to array, sort, and slice
+        // We need to fetch User names. 
+        // Optimized: Aggregation is better but complex with 'lookup' on filtered documents. 
+        // JS processing is fine for <10k records. For scaling, move to aggregate.
+        const topNoShowersIds = Object.entries(noShowUserCounts)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5);
+
+        const topNoShowers = [];
+        for (const [uid, count] of topNoShowersIds) {
+            const u = await User.findById(uid);
+            if (u) topNoShowers.push({ name: u.name, email: u.email, count, id: u._id });
+        }
+
+
+        // --- HEAT MAP CALCULATIONS ---
+        // Aggregate all slots to find average occupancy by Day of Week + Hour
+        const heatMapData = await Slot.aggregate([
+            {
+                $project: {
+                    dayOfWeek: { $dayOfWeek: "$startTime" }, // 1 (Sun) - 7 (Sat)
+                    hour: { $hour: "$startTime" },
+                    bookings: { $size: "$bookings" },
+                    capacity: 1
+                }
+            },
+            {
+                $group: {
+                    _id: { day: "$dayOfWeek", hour: "$hour" },
+                    totalBookings: { $sum: "$bookings" },
+                    totalCapacity: { $sum: "$capacity" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    day: "$_id.day",
+                    hour: "$_id.hour",
+                    occupancyPercent: {
+                        $cond: [
+                            { $eq: ["$totalCapacity", 0] },
+                            0,
+                            { $multiply: [{ $divide: ["$totalBookings", "$totalCapacity"] }, 100] }
+                        ]
+                    },
+                    avgBookings: { $divide: ["$totalBookings", "$count"] }
+                }
+            },
+            { $sort: { day: 1, hour: 1 } }
+        ]);
+
+        // Existing Trends
         const highOccupancySlots = await Slot.aggregate([
             {
                 $project: {
@@ -314,9 +388,16 @@ const getStats = async (req, res) => {
             attended: attendedBookings,
             cancelled: cancelledBookings,
             slots: totalSlots,
-            trends: highOccupancySlots
+            trends: highOccupancySlots,
+            // New Analytics
+            noShowRate,
+            noShowCount,
+            topNoShowers,
+            heatMap: heatMapData,
+            revenueLost: noShowCount * 500 // Assuming 500 LKR per slot value? Just an estimate number.
         });
     } catch (error) {
+        console.error(error); // Log internal errors
         res.status(500).json({ message: error.message });
     }
 };

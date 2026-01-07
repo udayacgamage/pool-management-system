@@ -7,8 +7,9 @@ This guide explains how to use both your **Local Database** (for development) an
 
 ### How to Start
 1.  Open the `server` folder.
-2.  Double-click **`npm run dev`** (or run `.\npm run dev` in PowerShell).
-3.  **Keep the blue window open.** This is your server.
+2.  Open a terminal/PowerShell here.
+3.  Type **`npm run dev`** and press Enter.
+4.  **Keep the window open.** This is your server.
 
 ### Configuration (`server/.env`)
 Your `.env` file should look like this for local work:

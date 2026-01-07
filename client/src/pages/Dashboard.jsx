@@ -242,7 +242,7 @@ const Dashboard = () => {
     const baseURL = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:5000';
 
     return (
-        <div className="h-screen w-screen bg-[#f8faff] flex font-sans overflow-hidden">
+        <div className="h-[100dvh] md:h-screen w-screen bg-[#f8faff] flex font-sans overflow-hidden">
             <style>{`
                 .react-calendar { 
                     border: none; 
@@ -539,7 +539,7 @@ const Dashboard = () => {
                             )}
 
                             {activeTab === 'profile' && (
-                                <div className="max-w-2xl mx-auto bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl animate-fade-in">
+                                <div className="max-w-2xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-xl animate-fade-in">
                                     <div className="text-center mb-10">
                                         <div className="relative w-32 h-32 mx-auto mb-6 rounded-full bg-slate-100 border-4 border-white shadow-2xl overflow-hidden group">
                                             {user?.profilePic ? (

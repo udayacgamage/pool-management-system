@@ -50,15 +50,35 @@ app.use('/api/holidays', require('./routes/holidayRoutes'));
 app.use('/api/coach-allocations', require('./routes/coachRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
 
+const { initSlotGenerationJob, generateSlots } = require('./jobs/slotGenerationJob');
+
 /* 
 // Old connection method - disabled for serverless stability
 connectDB().then(() => {
   // Start Cron Jobs (Disabled for Serverless/Vercel)
   // initReminderJob(); 
+  initSlotGenerationJob();
+  
+  // DEV: Run once immediately to populate data for review
+  console.log('Triggering initial slot check...');
+  generateSlots();
 }).catch(err => {
   console.error(`DB connection failed: ${err.message}`);
 }); 
 */
+
+// For Vercel/Serverless adaptations, we might need a HTTP endpoint to trigger these cron jobs 
+// if actual background processes aren't supported. 
+// However, assuming this runs as a standard Node server locally:
+if (process.env.NODE_ENV !== 'production') {
+  // Re-enable DB connection for local dev to support cron jobs
+  connectDB().then(() => {
+    // initReminderJob();
+    initSlotGenerationJob();
+    // Run once on startup to ensure data exists for the user immediately
+    generateSlots();
+  });
+}
 
 // Basic Route
 app.get('/', (req, res) => {

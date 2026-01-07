@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import api, { getCoaches } from '../services/api';
+import api from '../services/api';
 import poolView from '../assets/gallery/pool_view.jpg';
 import poolAction from '../assets/gallery/pool_action.jpg';
 import poolLanes from '../assets/gallery/pool_lanes.jpg';
@@ -59,16 +59,15 @@ const Landing = () => {
     }, []);
 
     React.useEffect(() => {
-        const fetchCoaches = async () => {
-            try {
-                const res = await getCoaches();
-                setCoaches(res.data || []);
-            } catch (err) {
-                setCoaches([]);
-            }
-        };
-
-        fetchCoaches();
+        // Use static data as requested
+        // Use static data as requested
+        setCoaches([
+            { name: 'Kithsiri Duminda', specialization: 'Head Coach', email: 'coach.kithsiri@sjp.ac.lk', schedule: 'Mon - Fri' },
+            { name: 'Waruni Liyanage', specialization: 'Swimming Instructor', email: 'coach.waruni@sjp.ac.lk', schedule: 'Mondays' },
+            { name: 'Banula Devapriya', specialization: 'Swimming Instructor', email: 'coach.banula@sjp.ac.lk', schedule: 'Tuesdays' },
+            { name: 'Vihara Jayathilaka', specialization: 'Swimming Instructor', email: 'coach.vihara@sjp.ac.lk', schedule: 'Wednesdays' },
+            { name: 'Amadhi Kiripitige', specialization: 'Swimming Instructor', email: 'coach.amadhi@sjp.ac.lk', schedule: 'Thu - Fri' }
+        ]);
     }, []);
 
     // Role-aware portal helpers
@@ -106,9 +105,14 @@ const Landing = () => {
             {/* Navbar (glassmorphic) */}
             <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16 items-center">
-                        <Logo />
-                        <div className="hidden md:flex items-center space-x-8 text-xs font-black uppercase tracking-[0.2em]">
+                    <div className="relative flex justify-between h-16 items-center">
+                        {/* Left: Logo */}
+                        <div className="flex-shrink-0 flex items-center">
+                            <Logo />
+                        </div>
+
+                        {/* Center: Nav Links (Absolute Positioned for perfect centering) */}
+                        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center space-x-8 text-xs font-black uppercase tracking-[0.2em]">
                             {navLinks.map(link => (
                                 <a
                                     key={link.id}
@@ -121,7 +125,7 @@ const Landing = () => {
                             ))}
                         </div>
 
-                        {/* Right actions: Student Portal */}
+                        {/* Right: Actions */}
                         <div className="flex items-center gap-4">
                             {/* Mobile-only Portal button (placed before toggle) */}
                             <Link
@@ -143,7 +147,7 @@ const Landing = () => {
                             {/* Desktop Portal button (hidden on mobile) */}
                             <Link
                                 to={getPortalRoute(user)}
-                                className="btn-maroon motion-soft !px-6 !py-3 hidden md:inline-flex"
+                                className="btn-maroon motion-soft !px-6 !py-3 hidden md:inline-flex shadow-lg shadow-maroon/20"
                             >
                                 {getPortalLabel(user)}
                             </Link>
@@ -180,7 +184,7 @@ const Landing = () => {
             )}
 
             {/* Hero: centered logo, status pill, heading */}
-            <header id="home" className="relative h-[80vh] overflow-hidden flex items-center">
+            <header id="home" className="relative min-h-screen overflow-hidden flex items-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#fff5f5] via-[#fdeaea] to-[#fbe9e9]" />
                 <img
                     src={poolView}
@@ -313,19 +317,19 @@ const Landing = () => {
                                     <div className="grid grid-cols-2 gap-8 mt-10">
                                         <div className="border-l-2 pl-6 py-2" style={{ borderColor: 'rgba(128,0,0,0.25)' }}>
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest mb-1">Length</p>
-                                            <p className="text-3xl font-black text-mg">50.0m</p>
+                                            <p className="text-2xl md:text-3xl font-black text-mg">50.0m</p>
                                         </div>
                                         <div className="border-l-2 pl-6 py-2" style={{ borderColor: 'rgba(128,0,0,0.25)' }}>
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest mb-1">Width</p>
-                                            <p className="text-3xl font-black text-mg">25.0m</p>
+                                            <p className="text-2xl md:text-3xl font-black text-mg">25.0m</p>
                                         </div>
                                         <div className="border-l-2 pl-6 py-2" style={{ borderColor: 'rgba(128,0,0,0.25)' }}>
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest mb-1">Depth</p>
-                                            <p className="text-3xl font-black text-mg">1.3 - 2.0m</p>
+                                            <p className="text-2xl md:text-3xl font-black text-mg">1.3 - 2.0m</p>
                                         </div>
                                         <div className="border-l-2 pl-6 py-2" style={{ borderColor: 'rgba(128,0,0,0.25)' }}>
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest mb-1">Type</p>
-                                            <p className="text-3xl font-black text-mg">Semi-Olympic</p>
+                                            <p className="text-2xl md:text-3xl font-black text-mg">Semi-Olympic</p>
                                         </div>
                                     </div>
 
@@ -416,7 +420,7 @@ const Landing = () => {
                                         </div>
                                         <div className="mt-3 py-2 px-3 bg-slate-50 rounded-lg border border-slate-100 inline-block">
                                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Available On</p>
-                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule || '—'}</p>
+                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule}</p>
                                         </div>
                                         <p className="text-slate-500 text-xs mt-4">Connect via <span className="font-mono text-mg">{coach.email}</span></p>
                                     </div>
