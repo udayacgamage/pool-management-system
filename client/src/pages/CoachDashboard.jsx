@@ -46,6 +46,27 @@ const CoachDashboard = () => {
     const [profileError, setProfileError] = useState(null);
     const [profileSuccess, setProfileSuccess] = useState(null);
 
+    // Auto-dismiss scanner result overlays (success/error), including manual entry.
+    useEffect(() => {
+        if (activeTab !== 'scanner') return;
+        if (!scanResult && !error) return;
+
+        const timeout = setTimeout(() => {
+            setScanResult(null);
+            setError(null);
+            setScanning(false);
+            if (scannerRef.current?.resume) {
+                try {
+                    scannerRef.current.resume();
+                } catch {
+                    // ignore
+                }
+            }
+        }, 3000);
+
+        return () => clearTimeout(timeout);
+    }, [activeTab, scanResult, error]);
+
     useEffect(() => {
         if (activeTab === 'scanner') {
             // Give DOM time to render the id="reader" element
@@ -180,16 +201,6 @@ const CoachDashboard = () => {
         }
 
         await handleVerify(null, decodedText);
-
-        // Auto-restart after 3 seconds
-        setTimeout(() => {
-            setScanResult(null);
-            setError(null);
-            setScanning(false);
-            if (scannerRef.current) {
-                scannerRef.current.resume();
-            }
-        }, 3000);
     };
 
     const onScanFailure = (error) => {
@@ -199,7 +210,11 @@ const CoachDashboard = () => {
     const handleVerify = async (e, directCode) => {
         if (e) e.preventDefault();
         const code = directCode || qrInput;
-        if (!code) return;
+        if (!code) {
+            // Provide a clear message instead of silently doing nothing.
+            setError('Please enter a QR code value to verify.');
+            return;
+        }
 
         setError(null);
         setScanResult(null);
@@ -210,8 +225,8 @@ const CoachDashboard = () => {
             const response = await api.post('/bookings/verify', { qrCodeData: code }, config);
             setScanResult(response.data);
             setQrInput('');
-            // Refresh roster to show updated attendance
-            if (activeTab === 'roster') fetchDailySchedule(selectedDate);
+            // Pre-fetch roster so it’s updated when switching tabs.
+            fetchDailySchedule(selectedDate);
         } catch (err) {
             setError(err.response?.data?.message || 'Verification Failed');
         } finally {
