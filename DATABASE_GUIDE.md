@@ -7,7 +7,7 @@ This guide explains how to use both your **Local Database** (for development) an
 
 ### How to Start
 1.  Open the `server` folder.
-2.  Double-click **`start_db.ps1`** (or run `.\start_db.ps1` in PowerShell).
+2.  Double-click **`npm run dev`** (or run `.\npm run dev` in PowerShell).
 3.  **Keep the blue window open.** This is your server.
 
 ### Configuration (`server/.env`)
