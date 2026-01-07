@@ -48,6 +48,7 @@ const registerUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 specialization: user.specialization,
+                schedule: user.schedule,
                 qrCode: user.qrCode,
                 profilePic: user.profilePic,
                 token: generateToken(user._id),
@@ -78,6 +79,7 @@ const loginUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 specialization: user.specialization,
+                schedule: user.schedule,
                 qrCode: user.qrCode, // return the same QR code
                 profilePic: user.profilePic,
                 token: generateToken(user._id),
@@ -103,7 +105,7 @@ const getMe = async (req, res) => {
             email: user.email,
             role: user.role,
             specialization: user.specialization,
-            specialization: user.specialization,
+            schedule: user.schedule,
             qrCode: user.qrCode, // added
             profilePic: user.profilePic,
         });
@@ -152,8 +154,44 @@ const deleteUser = async (req, res) => {
 const getCoaches = async (req, res) => {
     try {
         const coaches = await User.find({ role: 'coach' })
-            .select('name email specialization');
+            .select('name email specialization schedule profilePic');
         res.status(200).json(coaches);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Update coach profile (specialization + schedule)
+// @route   PUT /api/auth/coach-profile
+// @access  Private/Coach
+const updateCoachProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.role !== 'coach' && user.role !== 'admin') {
+            return res.status(403).json({ message: 'Only coaches can update coach profile' });
+        }
+
+        const { specialization, schedule } = req.body;
+
+        if (typeof specialization === 'string') user.specialization = specialization;
+        if (typeof schedule === 'string') user.schedule = schedule;
+
+        await user.save();
+
+        res.status(200).json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            specialization: user.specialization,
+            schedule: user.schedule,
+            qrCode: user.qrCode,
+            profilePic: user.profilePic,
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -194,7 +232,7 @@ module.exports = {
     getMe,
     getAllUsers,
     deleteUser,
-    deleteUser,
     getCoaches,
-    uploadProfilePic
+    uploadProfilePic,
+    updateCoachProfile
 };

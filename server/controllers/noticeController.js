@@ -20,30 +20,41 @@ const getNotices = async (req, res) => {
 const createNotice = async (req, res) => {
     try {
         const { title, content, languages, type } = req.body;
+
+        if (!title || !content) {
+            return res.status(400).json({ message: 'Title and content are required' });
+        }
+
+        // Coaches can post announcements, but they are limited to the "Coach" type.
+        const resolvedType = req.user?.role === 'coach' ? 'Coach' : (type || 'General');
+
         const notice = await Notice.create({
             title,
             content,
             languages,
-            type
+            type: resolvedType,
+            postedBy: req.user?._id,
+            postedByName: req.user?.name || '',
+            postedByRole: req.user?.role || '',
         });
 
-        // Broadcast Email to all students
-        const students = await User.find({ role: 'student' });
+        // Broadcast email only for admin-posted notices (avoid spamming students with frequent coach posts)
+        if (req.user?.role === 'admin') {
+            const students = await User.find({ role: 'student' });
 
-        // We can send individually or use BCC. For simplicity and personalization, iterating is okay for small scale.
-        // For larger scale, a queue system is better. Proceeding with simple iteration as per project scope.
-        for (const student of students) {
-            if (student.email) {
-                const message = `
-                    <h3>New Notice: ${title}</h3>
-                    <p>Hello ${student.name},</p>
-                    <p>A new notice has been posted on the pool management portal.</p>
-                    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #800000; margin: 20px 0;">
-                        ${content}
-                    </div>
-                `;
-                // Use fire-and-forget (don't await) to not block the response
-                sendEmail(student.email, `New Notice: ${title}`, message);
+            for (const student of students) {
+                if (student.email) {
+                    const message = `
+                        <h3>New Notice: ${title}</h3>
+                        <p>Hello ${student.name},</p>
+                        <p>A new notice has been posted on the pool management portal.</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #800000; margin: 20px 0;">
+                            ${content}
+                        </div>
+                    `;
+                    // Use fire-and-forget (don't await) to not block the response
+                    sendEmail(student.email, `New Notice: ${title}`, message);
+                }
             }
         }
 

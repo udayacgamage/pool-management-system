@@ -35,6 +35,10 @@ const userSchema = mongoose.Schema(
         specialization: {
             type: String, // For coaches
         },
+        schedule: {
+            type: String, // For coaches (availability summary like "Mon - Fri")
+            default: '',
+        },
         qrCode: {
             type: String,
             unique: true,

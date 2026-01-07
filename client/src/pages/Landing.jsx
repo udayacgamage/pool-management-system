@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import api from '../services/api';
+import api, { getCoaches } from '../services/api';
 import poolView from '../assets/gallery/pool_view.jpg';
 import poolAction from '../assets/gallery/pool_action.jpg';
 import poolLanes from '../assets/gallery/pool_lanes.jpg';
@@ -59,15 +59,16 @@ const Landing = () => {
     }, []);
 
     React.useEffect(() => {
-        // Use static data as requested
-        // Use static data as requested
-        setCoaches([
-            { name: 'Kithsiri Duminda', specialization: 'Head Coach', email: 'coach.kithsiri@sjp.ac.lk', schedule: 'Mon - Fri' },
-            { name: 'Waruni Liyanage', specialization: 'Swimming Instructor', email: 'coach.waruni@sjp.ac.lk', schedule: 'Mondays' },
-            { name: 'Banula Devapriya', specialization: 'Swimming Instructor', email: 'coach.banula@sjp.ac.lk', schedule: 'Tuesdays' },
-            { name: 'Vihara Jayathilaka', specialization: 'Swimming Instructor', email: 'coach.vihara@sjp.ac.lk', schedule: 'Wednesdays' },
-            { name: 'Amadhi Kiripitige', specialization: 'Swimming Instructor', email: 'coach.amadhi@sjp.ac.lk', schedule: 'Thu - Fri' }
-        ]);
+        const fetchCoaches = async () => {
+            try {
+                const res = await getCoaches();
+                setCoaches(res.data || []);
+            } catch (err) {
+                setCoaches([]);
+            }
+        };
+
+        fetchCoaches();
     }, []);
 
     // Role-aware portal helpers
@@ -415,7 +416,7 @@ const Landing = () => {
                                         </div>
                                         <div className="mt-3 py-2 px-3 bg-slate-50 rounded-lg border border-slate-100 inline-block">
                                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Available On</p>
-                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule}</p>
+                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule || '—'}</p>
                                         </div>
                                         <p className="text-slate-500 text-xs mt-4">Connect via <span className="font-mono text-mg">{coach.email}</span></p>
                                     </div>
