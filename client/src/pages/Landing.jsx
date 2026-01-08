@@ -60,16 +60,30 @@ const Landing = () => {
     }, []);
 
     React.useEffect(() => {
-        // Use static data as requested
-        // Use static data as requested
-        setCoaches([
-            { name: 'Kithsiri Duminda', specialization: 'Head Coach', email: 'coach.kithsiri@sjp.ac.lk', schedule: 'Mon - Fri' },
-            { name: 'Waruni Liyanage', specialization: 'Swimming Instructor', email: 'coach.waruni@sjp.ac.lk', schedule: 'Mondays' },
-            { name: 'Banula Devapriya', specialization: 'Swimming Instructor', email: 'coach.banula@sjp.ac.lk', schedule: 'Tuesdays' },
-            { name: 'Vihara Jayathilaka', specialization: 'Swimming Instructor', email: 'coach.vihara@sjp.ac.lk', schedule: 'Wednesdays' },
-            { name: 'Amadhi Kiripitige', specialization: 'Swimming Instructor', email: 'coach.amadhi@sjp.ac.lk', schedule: 'Thu - Fri' }
-        ]);
+        const fallback = [
+            { id: 'static-1', name: 'Kithsiri Duminda', specialization: 'Head Coach', email: 'coach.kithsiri@sjp.ac.lk', schedule: 'Mon - Fri' },
+            { id: 'static-2', name: 'Waruni Liyanage', specialization: 'Swimming Instructor', email: 'coach.waruni@sjp.ac.lk', schedule: 'Mondays' },
+            { id: 'static-3', name: 'Banula Devapriya', specialization: 'Swimming Instructor', email: 'coach.banula@sjp.ac.lk', schedule: 'Tuesdays' },
+            { id: 'static-4', name: 'Vihara Jayathilaka', specialization: 'Swimming Instructor', email: 'coach.vihara@sjp.ac.lk', schedule: 'Wednesdays' },
+            { id: 'static-5', name: 'Amadhi Kiripitige', specialization: 'Swimming Instructor', email: 'coach.amadhi@sjp.ac.lk', schedule: 'Thu - Fri' }
+        ];
+
+        const loadCoaches = async () => {
+            try {
+                const res = await api.get('/auth/coaches');
+                const list = Array.isArray(res.data) ? res.data : [];
+                setCoaches(list.length > 0 ? list : fallback);
+            } catch (err) {
+                setCoaches(fallback);
+            }
+        };
+
+        loadCoaches();
     }, []);
+
+    const baseURL = import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+        : 'http://localhost:5000';
 
     // Role-aware portal helpers
     const getPortalRoute = (u) => {
@@ -420,7 +434,18 @@ const Landing = () => {
                                 coaches.map(coach => (
                                     <div key={coach._id || coach.id} className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl hover:-translate-y-1 hover:shadow-2xl transition-all">
                                         <div className="flex items-center gap-4 mb-4">
-                                            <div className="w-14 h-14 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-xl">🏊</div>
+                                            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center text-xl shrink-0">
+                                                {coach.profilePic ? (
+                                                    <img
+                                                        src={`${baseURL}${coach.profilePic}`}
+                                                        alt={coach.name}
+                                                        className="w-full h-full object-cover"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <span aria-hidden="true">🏊</span>
+                                                )}
+                                            </div>
                                             <div>
                                                 <h3 className="text-xl font-black text-slate-800">{coach.name}</h3>
                                                 <p className="text-xs font-black text-primary-600 uppercase tracking-widest">{coach.specialization || 'Coach'}</p>
@@ -428,7 +453,7 @@ const Landing = () => {
                                         </div>
                                         <div className="mt-3 py-2 px-3 bg-slate-50 rounded-lg border border-slate-100 inline-block">
                                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Available On</p>
-                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule}</p>
+                                            <p className="font-bold text-slate-700 text-sm">{coach.schedule || '—'}</p>
                                         </div>
                                         <p className="text-slate-500 text-xs mt-4">Connect via <span className="font-mono text-mg">{coach.email}</span></p>
                                     </div>

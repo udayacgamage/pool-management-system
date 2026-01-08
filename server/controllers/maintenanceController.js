@@ -208,7 +208,14 @@ exports.getPoolStatus = async (req, res) => {
   try {
     const now = new Date();
 
-    const manualOverride = await PoolStatus.findOne({ manualOverride: true })
+    const manualOverride = await PoolStatus.findOne({
+      manualOverride: true,
+      $or: [
+        { effectiveUntil: { $exists: false } },
+        { effectiveUntil: null },
+        { effectiveUntil: { $gt: now } }
+      ]
+    })
       .sort({ createdAt: -1 })
       .populate('updatedBy', 'name email role')
       .populate('maintenanceRef', 'title scheduledDate');
@@ -232,19 +239,15 @@ exports.getPoolStatus = async (req, res) => {
     let overridePayload = null;
 
     if (manualOverride) {
-      const overrideActive = !manualOverride.effectiveUntil || manualOverride.effectiveUntil > now;
-
-      if (overrideActive) {
-        poolStatus = manualOverride.status;
-        overridePayload = {
-          status: manualOverride.status,
-          message: manualOverride.message,
-          effectiveUntil: manualOverride.effectiveUntil,
-          updatedAt: manualOverride.updatedAt,
-          updatedBy: manualOverride.updatedBy,
-          maintenanceRef: manualOverride.maintenanceRef,
-        };
-      }
+      poolStatus = manualOverride.status;
+      overridePayload = {
+        status: manualOverride.status,
+        message: manualOverride.message,
+        effectiveUntil: manualOverride.effectiveUntil,
+        updatedAt: manualOverride.updatedAt,
+        updatedBy: manualOverride.updatedBy,
+        maintenanceRef: manualOverride.maintenanceRef,
+      };
     }
 
     res.status(200).json({
@@ -268,6 +271,9 @@ exports.getPoolStatus = async (req, res) => {
 exports.setPoolStatus = async (req, res) => {
   try {
     const { status, message, effectiveUntil, maintenanceRef } = req.body;
+    const now = new Date();
+
+    const trimmedMessage = typeof message === 'string' ? message.trim() : message;
 
     if (!['open', 'closed', 'restricted'].includes(status)) {
       return res.status(400).json({
@@ -276,11 +282,28 @@ exports.setPoolStatus = async (req, res) => {
       });
     }
 
-    const manualOverrideFlag = !(status === 'open' && !message && !maintenanceRef);
+    // Setting status to "open" with no message/maintenanceRef is treated as clearing the override.
+    const isClearOverride = status === 'open' && !trimmedMessage && !maintenanceRef && !effectiveUntil;
+
+    if (isClearOverride) {
+      await PoolStatus.updateMany(
+        {
+          manualOverride: true,
+          $or: [
+            { effectiveUntil: { $exists: false } },
+            { effectiveUntil: null },
+            { effectiveUntil: { $gt: now } }
+          ]
+        },
+        { $set: { manualOverride: false, effectiveUntil: now } }
+      );
+    }
+
+    const manualOverrideFlag = !(status === 'open' && !trimmedMessage && !maintenanceRef);
 
     const override = await PoolStatus.create({
       status,
-      message,
+      message: trimmedMessage || undefined,
       manualOverride: manualOverrideFlag,
       effectiveUntil: effectiveUntil ? new Date(effectiveUntil) : undefined,
       maintenanceRef: maintenanceRef || undefined,

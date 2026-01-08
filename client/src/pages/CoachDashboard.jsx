@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import api, { getAuthHeader, createNotice, getNotices, updateCoachProfile } from '../services/api';
+import api, { getAuthHeader, createNotice, getNotices, updateCoachProfile, uploadProfilePic } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
 import { Link } from 'react-router-dom';
 
 const CoachDashboard = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, updateUser } = useAuth();
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -45,6 +45,11 @@ const CoachDashboard = () => {
     const [profileSaving, setProfileSaving] = useState(false);
     const [profileError, setProfileError] = useState(null);
     const [profileSuccess, setProfileSuccess] = useState(null);
+
+    const [profilePicFile, setProfilePicFile] = useState(null);
+    const [profilePicUploading, setProfilePicUploading] = useState(false);
+    const [profilePicError, setProfilePicError] = useState(null);
+    const [profilePicSuccess, setProfilePicSuccess] = useState(null);
 
     useEffect(() => {
         if (activeTab === 'scanner') {
@@ -165,6 +170,38 @@ const CoachDashboard = () => {
             setProfileError(err.response?.data?.message || 'Failed to update profile.');
         } finally {
             setProfileSaving(false);
+        }
+    };
+
+    const handleProfilePicUpload = async (e) => {
+        e.preventDefault();
+        setProfilePicError(null);
+        setProfilePicSuccess(null);
+
+        if (!profilePicFile) {
+            setProfilePicError('Please select a photo first.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profilePic', profilePicFile);
+
+        try {
+            setProfilePicUploading(true);
+            const res = await uploadProfilePic(formData);
+            const filePath = res?.data?.filePath;
+
+            if (!filePath) {
+                throw new Error('Upload succeeded but no file path was returned.');
+            }
+
+            updateUser({ profilePic: filePath });
+            setProfilePicFile(null);
+            setProfilePicSuccess('Profile photo updated.');
+        } catch (err) {
+            setProfilePicError(err?.response?.data?.message || err?.message || 'Failed to upload profile photo.');
+        } finally {
+            setProfilePicUploading(false);
         }
     };
 
@@ -408,7 +445,22 @@ const CoachDashboard = () => {
                     {isSidebarOpen && (
                         <div className="mt-4 p-4 rounded-2xl bg-white/10 border border-white/10">
                             <p className="text-xs font-black uppercase tracking-widest text-white/60">Signed in as</p>
-                            <p className="mt-2 font-bold text-white truncate">{user?.name || 'Coach'}</p>
+                            <div className="mt-3 flex items-center gap-3 min-w-0">
+                                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                                    {user?.profilePic ? (
+                                        <img
+                                            src={`${baseURL}${user.profilePic}`}
+                                            alt={user?.name || 'Coach'}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-xs font-black text-white/80">
+                                            {(user?.name || 'C').charAt(0)}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="font-bold text-white truncate">{user?.name || 'Coach'}</p>
+                            </div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1 truncate">
                                 {user?.specialization ? `${user.specialization} Coach` : 'Coach Portal'}
                             </p>
@@ -783,6 +835,63 @@ const CoachDashboard = () => {
                             <p className="text-slate-500 text-sm mb-6">
                                 Update your specialization and availability.
                             </p>
+
+                            <div className="mb-8 p-6 rounded-[2rem] bg-slate-50 border border-slate-200">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                                    <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                                        {user?.profilePic ? (
+                                            <img
+                                                src={`${baseURL}${user.profilePic}`}
+                                                alt={user?.name || 'Coach'}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-2xl font-black text-slate-600">
+                                                {(user?.name || 'C').charAt(0)}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-black text-slate-800 truncate">{user?.name || 'Coach'}</p>
+                                        <p className="text-xs font-bold text-slate-500 truncate">{user?.email || ''}</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
+                                            Profile Photo
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {profilePicError && (
+                                    <div className="mt-5 p-4 rounded-2xl border bg-rose-50 text-rose-700 border-rose-100">
+                                        <p className="font-black text-[10px] uppercase tracking-widest">{profilePicError}</p>
+                                    </div>
+                                )}
+                                {profilePicSuccess && (
+                                    <div className="mt-5 p-4 rounded-2xl border bg-emerald-50 text-emerald-800 border-emerald-100">
+                                        <p className="font-black text-[10px] uppercase tracking-widest">{profilePicSuccess}</p>
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleProfilePicUpload} className="mt-5 flex flex-col sm:flex-row gap-3 sm:items-center">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            setProfilePicError(null);
+                                            setProfilePicSuccess(null);
+                                            setProfilePicFile(e.target.files?.[0] || null);
+                                        }}
+                                        className="w-full sm:flex-1 h-12 bg-white border border-slate-200 rounded-xl px-4 font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-mg/20"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={profilePicUploading}
+                                        className="btn-maroon h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-mg/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {profilePicUploading ? 'Uploading...' : 'Upload Photo'}
+                                    </button>
+                                </form>
+                            </div>
 
                             {profileError && (
                                 <div className="mb-6 p-4 rounded-2xl border bg-rose-50 text-rose-700 border-rose-100">

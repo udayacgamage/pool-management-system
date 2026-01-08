@@ -87,15 +87,25 @@ const AdminMaintenance = () => {
 
     try {
       setPoolStatusLoading(true);
-      await api.put('/maintenance/pool-status', {
-        status,
-        message: poolStatusMessage || undefined
-      });
+      const trimmedMessage = (poolStatusMessage || '').trim();
+
+      // Setting the pool to "open" is intended to clear any manual override.
+      // Do not send a message in that case, and clear the message field locally.
+      const payload =
+        status === 'open'
+          ? { status }
+          : { status, message: trimmedMessage ? trimmedMessage : undefined };
+
+      await api.put('/maintenance/pool-status', payload);
+      if (status === 'open') {
+        setPoolStatusMessage('');
+      }
       setSuccess(`Pool status updated to ${status}`);
       await fetchPoolStatus();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update pool status');
     } finally {
+      setPoolStatusLoading(false);
       setPoolStatusUpdating(false);
     }
   };
@@ -182,12 +192,12 @@ const AdminMaintenance = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-mg-soft py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Maintenance Management</h1>
 
-          <div className="bg-white rounded-lg shadow p-6 mb-6 border border-blue-100">
+          <div className="card p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
               <div>
                 <div className="text-sm uppercase tracking-wide text-gray-500">Current Pool Status</div>
@@ -209,10 +219,10 @@ const AdminMaintenance = () => {
                     type="button"
                     onClick={() => updatePoolStatus(status)}
                     disabled={poolStatusUpdating}
-                    className={`px-4 py-2 rounded-lg capitalize transition-colors ${
+                    className={`px-4 py-2 rounded-2xl capitalize motion-soft border ${
                       (poolStatusInfo?.status === status && !poolStatusLoading)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                        ? 'bg-mg text-white border-mg'
+                        : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
                     } ${poolStatusUpdating ? 'opacity-70 cursor-not-allowed' : ''}`}
                   >
                     Set {status}
@@ -280,10 +290,10 @@ const AdminMaintenance = () => {
               <button
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-lg capitalize ${
+                className={`px-4 py-2 rounded-2xl capitalize motion-soft border ${
                   filter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                    ? 'bg-mg text-white border-mg'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 {status}

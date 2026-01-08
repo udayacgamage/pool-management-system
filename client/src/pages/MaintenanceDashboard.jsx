@@ -1,14 +1,22 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 
 const MaintenanceDashboard = () => {
-  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [maintenanceRecords, setMaintenanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const createSectionRef = useRef(null);
+  const recordsSectionRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -506,39 +514,147 @@ const MaintenanceDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+      <div className="h-[100dvh] md:h-screen w-screen bg-[#fafbfc] flex items-center justify-center">
+        <div
+          className="w-10 h-10 border-4 border-slate-200 rounded-full animate-spin"
+          style={{ borderTopColor: 'var(--mg)' }}
+          aria-label="Loading"
+        ></div>
       </div>
     );
   }
 
+  const scrollTo = (ref) => {
+    ref?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleNav = (id) => {
+    if (id === 'create') {
+      setShowForm(true);
+      setTimeout(() => scrollTo(createSectionRef), 0);
+    }
+    if (id === 'records') {
+      setShowForm(false);
+      setTimeout(() => scrollTo(recordsSectionRef), 0);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Maintenance Dashboard</h1>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            {showForm ? 'Cancel' : 'New Maintenance Report'}
-          </button>
+    <div className="h-[100dvh] md:h-screen w-screen bg-[#fafbfc] flex font-sans overflow-hidden">
+      {/* Mobile sidebar overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile menu button */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-[#5a0000] text-white rounded-2xl shadow-xl border border-[#5a0000] active:scale-95 transition-all"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+      >
+        {isMobileMenuOpen ? '✕' : '☰'}
+      </button>
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          ${isSidebarOpen ? 'w-72' : 'w-24'}
+          ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+          fixed lg:relative h-full z-50 flex-shrink-0
+          bg-[#5a0000] text-white transition-all duration-300 flex flex-col
+        `}
+      >
+        <div className="p-8 border-b border-slate-800/50">
+          <Logo size="md" dark showText={isSidebarOpen} />
         </div>
 
-        {error && (
-          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        )}
+        <nav className="flex-1 px-4 mt-8 space-y-2 text-[11px] font-black uppercase tracking-widest overflow-y-auto custom-scrollbar">
+          <button
+            type="button"
+            onClick={() => handleNav('create')}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all text-slate-200 hover:bg-[#6a0000]/50 hover:text-white"
+          >
+            <span className="text-xl">📝</span>
+            {isSidebarOpen && <span>Create Report</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleNav('records')}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all text-slate-200 hover:bg-[#6a0000]/50 hover:text-white"
+          >
+            <span className="text-xl">📋</span>
+            {isSidebarOpen && <span>Records</span>}
+          </button>
+          <Link
+            to="/"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all text-slate-200 hover:bg-[#6a0000]/50 hover:text-white"
+          >
+            <span className="text-xl">🏠</span>
+            {isSidebarOpen && <span>Home</span>}
+          </Link>
+        </nav>
 
-        {success && (
-          <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            {success}
+        <div className="p-6 mt-auto space-y-3">
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="w-full flex items-center gap-4 px-4 py-4 text-slate-200 hover:bg-white/10 rounded-2xl transition-all"
+          >
+            <span className="text-xl">↔</span>
+            {isSidebarOpen && <span className="font-bold">Toggle Sidebar</span>}
+          </button>
+          <button
+            type="button"
+            onClick={logout}
+            className="w-full flex items-center gap-4 px-4 py-4 text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 rounded-2xl transition-all"
+          >
+            <span className="text-xl">🚪</span>
+            {isSidebarOpen && <span className="font-bold">Sign Out</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 h-full overflow-y-auto p-6 lg:p-10 scroll-smooth">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-slate-800">Maintenance Dashboard</h1>
+            <p className="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Maintenance Portal</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              const next = !showForm;
+              setShowForm(next);
+              if (next) setTimeout(() => scrollTo(createSectionRef), 0);
+            }}
+            className="btn-maroon px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg"
+          >
+            {showForm ? 'Close Form' : '+ New Report'}
+          </button>
+        </header>
+
+        {(error || success) && (
+          <div
+            className={`mb-8 p-5 rounded-2xl flex items-center gap-4 border ${
+              error
+                ? 'bg-rose-50 text-rose-700 border-rose-100'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+            }`}
+          >
+            <span className="text-xl">{error ? '🚫' : '💎'}</span>
+            <p className="font-black text-[10px] uppercase tracking-widest">{error || success}</p>
           </div>
         )}
 
         {showForm && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <div ref={createSectionRef} className="card p-6 mb-8">
             <h2 className="text-2xl font-bold mb-6">Create Maintenance Report</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Information */}
@@ -553,7 +669,7 @@ const MaintenanceDashboard = () => {
                     value={formData.title}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   />
                 </div>
 
@@ -565,7 +681,7 @@ const MaintenanceDashboard = () => {
                     name="type"
                     value={formData.type}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="routine">Routine</option>
                     <option value="emergency">Emergency</option>
@@ -582,7 +698,7 @@ const MaintenanceDashboard = () => {
                     name="priority"
                     value={formData.priority}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -601,7 +717,7 @@ const MaintenanceDashboard = () => {
                     value={formData.scheduledDate}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   />
                 </div>
 
@@ -613,7 +729,7 @@ const MaintenanceDashboard = () => {
                     name="poolStatus"
                     value={formData.poolStatus}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="open">Open</option>
                     <option value="closed">Closed</option>
@@ -632,7 +748,7 @@ const MaintenanceDashboard = () => {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   />
                 </div>
 
@@ -644,7 +760,7 @@ const MaintenanceDashboard = () => {
                     name="lifeguardCoverage"
                     value={formData.lifeguardCoverage}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="full">Full</option>
                     <option value="partial">Partial</option>
@@ -660,7 +776,7 @@ const MaintenanceDashboard = () => {
                     name="crowdLevel"
                     value={formData.crowdLevel}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="low">Low</option>
                     <option value="moderate">Moderate</option>
@@ -678,7 +794,7 @@ const MaintenanceDashboard = () => {
                     value={formData.incidentsReported}
                     onChange={handleChange}
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="input-field !px-4 !py-2"
                   />
                 </div>
               </div>
@@ -694,7 +810,7 @@ const MaintenanceDashboard = () => {
                       name="poolClosureReason"
                       value={formData.poolClosureReason}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="input-field !px-4 !py-2"
                     />
                   </div>
 
@@ -707,7 +823,7 @@ const MaintenanceDashboard = () => {
                       name="estimatedReopenDate"
                       value={formData.estimatedReopenDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="input-field !px-4 !py-2"
                     />
                   </div>
                 </div>
@@ -723,7 +839,7 @@ const MaintenanceDashboard = () => {
                   onChange={handleChange}
                   required
                   rows="4"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="input-field !px-4 !py-2"
                 />
               </div>
 
@@ -734,7 +850,7 @@ const MaintenanceDashboard = () => {
                   <select
                     value={selectedChemicalTemplate}
                     onChange={handleChemicalTemplateChange}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     {chemicalTemplates.map((template) => (
                       <option key={template.value} value={template.value}>
@@ -747,26 +863,26 @@ const MaintenanceDashboard = () => {
                     placeholder="Chemical Name"
                     value={chemical.name}
                     onChange={(e) => setChemical({...chemical, name: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="number"
                     placeholder="Current Level"
                     value={chemical.currentLevel}
                     onChange={(e) => setChemical({...chemical, currentLevel: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="text"
                     placeholder="Unit (e.g., ppm)"
                     value={chemical.unit}
                     onChange={(e) => setChemical({...chemical, unit: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <select
                     value={chemical.status}
                     onChange={(e) => setChemical({...chemical, status: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="optimal">Optimal</option>
                     <option value="low">Low</option>
@@ -776,7 +892,7 @@ const MaintenanceDashboard = () => {
                   <button
                     type="button"
                     onClick={addChemical}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add
                   </button>
@@ -785,7 +901,7 @@ const MaintenanceDashboard = () => {
                 {formData.chemicals.length > 0 && (
                   <div className="space-y-2">
                     {formData.chemicals.map((chem, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div key={index} className="flex items-center justify-between bg-white/70 border border-slate-200 p-3 rounded-2xl">
                         <span>{chem.name}: {chem.currentLevel} {chem.unit} - {chem.status}</span>
                         <button
                           type="button"
@@ -807,7 +923,7 @@ const MaintenanceDashboard = () => {
                   <select
                     value={selectedWaterTemplate}
                     onChange={handleWaterTemplateChange}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     {waterTestTemplates.map((template) => (
                       <option key={template.value} value={template.value}>
@@ -820,21 +936,21 @@ const MaintenanceDashboard = () => {
                     placeholder="Parameter (e.g., pH)"
                     value={waterTest.parameter}
                     onChange={(e) => setWaterTest({ ...waterTest, parameter: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="number"
                     placeholder="Reading"
                     value={waterTest.reading}
                     onChange={(e) => setWaterTest({ ...waterTest, reading: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="text"
                     placeholder="Unit"
                     value={waterTest.unit}
                     onChange={(e) => setWaterTest({ ...waterTest, unit: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <input
@@ -842,26 +958,26 @@ const MaintenanceDashboard = () => {
                       placeholder="Min"
                       value={waterTest.idealRange.min}
                       onChange={(e) => setWaterTest({ ...waterTest, idealRange: { ...waterTest.idealRange, min: e.target.value } })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg"
+                      className="input-field !px-4 !py-2"
                     />
                     <input
                       type="number"
                       placeholder="Max"
                       value={waterTest.idealRange.max}
                       onChange={(e) => setWaterTest({ ...waterTest, idealRange: { ...waterTest.idealRange, max: e.target.value } })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg"
+                      className="input-field !px-4 !py-2"
                     />
                   </div>
                   <input
                     type="datetime-local"
                     value={waterTest.sampleTime}
                     onChange={(e) => setWaterTest({ ...waterTest, sampleTime: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <select
                     value={waterTest.status}
                     onChange={(e) => setWaterTest({ ...waterTest, status: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="pass">Pass</option>
                     <option value="monitor">Monitor</option>
@@ -870,7 +986,7 @@ const MaintenanceDashboard = () => {
                   <button
                     type="button"
                     onClick={addWaterTest}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add Test
                   </button>
@@ -879,7 +995,7 @@ const MaintenanceDashboard = () => {
                 {formData.waterTests.length > 0 && (
                   <div className="space-y-2">
                     {formData.waterTests.map((test, index) => (
-                      <div key={index} className="flex flex-wrap md:flex-nowrap items-center justify-between bg-gray-50 p-3 rounded-lg gap-2">
+                      <div key={index} className="flex flex-wrap md:flex-nowrap items-center justify-between bg-white/70 border border-slate-200 p-3 rounded-2xl gap-2">
                         <span className="text-sm">
                           <strong>{test.parameter}</strong>: {test.reading} {test.unit}
                           {test.idealRange.min && test.idealRange.max && ` (Ideal ${test.idealRange.min}-${test.idealRange.max})`} – {test.status}
@@ -907,33 +1023,33 @@ const MaintenanceDashboard = () => {
                     placeholder="Item"
                     value={supply.item}
                     onChange={(e) => setSupply({...supply, item: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="number"
                     placeholder="Quantity"
                     value={supply.quantity}
                     onChange={(e) => setSupply({...supply, quantity: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="text"
                     placeholder="Unit"
                     value={supply.unit}
                     onChange={(e) => setSupply({...supply, unit: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="number"
                     placeholder="Cost"
                     value={supply.cost}
                     onChange={(e) => setSupply({...supply, cost: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <button
                     type="button"
                     onClick={addSupply}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add
                   </button>
@@ -942,7 +1058,7 @@ const MaintenanceDashboard = () => {
                 {formData.supplies.length > 0 && (
                   <div className="space-y-2">
                     {formData.supplies.map((sup, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div key={index} className="flex items-center justify-between bg-white/70 border border-slate-200 p-3 rounded-2xl">
                         <span>{sup.item}: {sup.quantity} {sup.unit} {sup.cost && `- $${sup.cost}`}</span>
                         <button
                           type="button"
@@ -966,12 +1082,12 @@ const MaintenanceDashboard = () => {
                     placeholder="Equipment"
                     value={equipmentInspection.equipmentName}
                     onChange={(e) => setEquipmentInspection({ ...equipmentInspection, equipmentName: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <select
                     value={equipmentInspection.condition}
                     onChange={(e) => setEquipmentInspection({ ...equipmentInspection, condition: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="excellent">Excellent</option>
                     <option value="good">Good</option>
@@ -984,12 +1100,12 @@ const MaintenanceDashboard = () => {
                     placeholder="Inspector"
                     value={equipmentInspection.inspector}
                     onChange={(e) => setEquipmentInspection({ ...equipmentInspection, inspector: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <button
                     type="button"
                     onClick={addEquipmentInspection}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add Inspection
                   </button>
@@ -1001,27 +1117,27 @@ const MaintenanceDashboard = () => {
                     placeholder="Issues Found"
                     value={equipmentInspection.issuesFound}
                     onChange={(e) => setEquipmentInspection({ ...equipmentInspection, issuesFound: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="text"
                     placeholder="Corrective Actions"
                     value={equipmentInspection.correctiveActions}
                     onChange={(e) => setEquipmentInspection({ ...equipmentInspection, correctiveActions: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="date"
                       value={equipmentInspection.lastServicedDate}
                       onChange={(e) => setEquipmentInspection({ ...equipmentInspection, lastServicedDate: e.target.value })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg"
+                      className="input-field !px-4 !py-2"
                     />
                     <input
                       type="date"
                       value={equipmentInspection.nextServiceDue}
                       onChange={(e) => setEquipmentInspection({ ...equipmentInspection, nextServiceDue: e.target.value })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg"
+                      className="input-field !px-4 !py-2"
                     />
                   </div>
                 </div>
@@ -1029,7 +1145,7 @@ const MaintenanceDashboard = () => {
                 {formData.equipmentInspections.length > 0 && (
                   <div className="space-y-2">
                     {formData.equipmentInspections.map((inspection, index) => (
-                      <div key={index} className="bg-gray-50 p-4 rounded-lg flex flex-col gap-2">
+                      <div key={index} className="bg-white/70 border border-slate-200 p-4 rounded-2xl flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                           <span className="font-semibold">{inspection.equipmentName}</span>
                           <button
@@ -1063,19 +1179,19 @@ const MaintenanceDashboard = () => {
                     placeholder="Task"
                     value={task.task}
                     onChange={(e) => setTask({...task, task: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <input
                     type="text"
                     placeholder="Description"
                     value={task.description}
                     onChange={(e) => setTask({...task, description: e.target.value})}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <button
                     type="button"
                     onClick={addTask}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add Task
                   </button>
@@ -1084,7 +1200,7 @@ const MaintenanceDashboard = () => {
                 {formData.tasks.length > 0 && (
                   <div className="space-y-2">
                     {formData.tasks.map((t, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div key={index} className="flex items-center justify-between bg-white/70 border border-slate-200 p-3 rounded-2xl">
                         <span>{t.task} {t.description && `- ${t.description}`}</span>
                         <button
                           type="button"
@@ -1108,12 +1224,12 @@ const MaintenanceDashboard = () => {
                     placeholder="Checklist Item"
                     value={safetyCheck.item}
                     onChange={(e) => setSafetyCheck({ ...safetyCheck, item: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <select
                     value={safetyCheck.status}
                     onChange={(e) => setSafetyCheck({ ...safetyCheck, status: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   >
                     <option value="compliant">Compliant</option>
                     <option value="needs-attention">Needs Attention</option>
@@ -1124,12 +1240,12 @@ const MaintenanceDashboard = () => {
                     placeholder="Verified By"
                     value={safetyCheck.verifiedBy}
                     onChange={(e) => setSafetyCheck({ ...safetyCheck, verifiedBy: e.target.value })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                    className="input-field !px-4 !py-2"
                   />
                   <button
                     type="button"
                     onClick={addSafetyCheck}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    className="btn-outline motion-soft !px-4 !py-2"
                   >
                     Add Check
                   </button>
@@ -1140,13 +1256,13 @@ const MaintenanceDashboard = () => {
                   value={safetyCheck.notes}
                   onChange={(e) => setSafetyCheck({ ...safetyCheck, notes: e.target.value })}
                   rows="2"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="input-field !px-4 !py-2"
                 />
 
                 {formData.safetyChecks.length > 0 && (
                   <div className="space-y-2 mt-4">
                     {formData.safetyChecks.map((check, index) => (
-                      <div key={index} className="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 p-3 rounded-lg gap-2">
+                      <div key={index} className="flex flex-col md:flex-row md:items-center justify-between bg-white/70 border border-slate-200 p-3 rounded-2xl gap-2">
                         <span className="text-sm">
                           <strong>{check.item}</strong> - {check.status}
                           {check.verifiedBy && ` (Verified by ${check.verifiedBy})`}
@@ -1174,7 +1290,7 @@ const MaintenanceDashboard = () => {
                   value={formData.notes}
                   onChange={handleChange}
                   rows="3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="input-field !px-4 !py-2"
                 />
               </div>
 
@@ -1182,13 +1298,13 @@ const MaintenanceDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="btn-outline motion-soft !px-6 !py-2"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="btn-maroon motion-soft !px-6 !py-2"
                 >
                   Submit Report
                 </button>
@@ -1198,13 +1314,20 @@ const MaintenanceDashboard = () => {
         )}
 
         {/* Maintenance Records List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold">Maintenance Records</h2>
+        <div ref={recordsSectionRef} className="card overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-slate-800">Maintenance Records</h2>
+            <button
+              type="button"
+              onClick={() => handleNav('create')}
+              className="btn-outline motion-soft !px-4 !py-2 text-xs uppercase tracking-widest"
+            >
+              + Create
+            </button>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead className="bg-white/60">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Title
@@ -1232,9 +1355,9 @@ const MaintenanceDashboard = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-slate-200">
                 {maintenanceRecords.map((record) => (
-                  <tr key={record._id} className="hover:bg-gray-50">
+                  <tr key={record._id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{record.title}</div>
                     </td>
@@ -1275,7 +1398,10 @@ const MaintenanceDashboard = () => {
             </table>
           </div>
         </div>
-      </div>
+
+        {/* Spacer for mobile scroll */}
+        <div className="h-10" />
+      </main>
     </div>
   );
 };
