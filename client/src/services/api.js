@@ -4,6 +4,24 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
 });
 
+// Add request interceptor to automatically include auth token
+api.interceptors.request.use(
+    (config) => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.token) {
+                config.headers.Authorization = `Bearer ${user.token}`;
+            }
+        } catch (err) {
+            console.error('Error getting auth token:', err);
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 // Helper to get auth header
 export const getAuthHeader = () => {
     try {

@@ -239,6 +239,11 @@ const Dashboard = () => {
         { id: 'profile', label: 'My Profile', icon: '👤' },
     ];
 
+    // Add maintenance option for maintenance staff
+    if (user?.role === 'maintenance' || user?.role === 'staff') {
+        navItems.push({ id: 'maintenance', label: 'Maintenance', icon: '🔧', link: '/maintenance' });
+    }
+
     const baseURL = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:5000';
 
     return (
@@ -304,29 +309,40 @@ const Dashboard = () => {
 
                 <nav className="flex-1 px-4 mt-6 space-y-2 overflow-y-auto">
                     {navItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => handleTabChange(item.id)}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
-                                ? 'bg-mg text-white shadow-lg'
-                                : 'text-white/70 hover:bg-[#6a0000] hover:text-white'
-                                }`}
-                        >
-                            <span className="text-xl relative">
-                                {item.icon}
-                                {item.id === 'notices' && unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border-2 border-mg-dark rounded-full"></span>
-                                )}
-                            </span>
-                            {isSidebarOpen && (
-                                <div className="flex-1 flex items-center justify-between">
-                                    <span className="font-semibold">{item.label}</span>
+                        item.link ? (
+                            <Link
+                                key={item.id}
+                                to={item.link}
+                                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-white/70 hover:bg-[#6a0000] hover:text-white"
+                            >
+                                <span className="text-xl">{item.icon}</span>
+                                {isSidebarOpen && <span className="font-semibold">{item.label}</span>}
+                            </Link>
+                        ) : (
+                            <button
+                                key={item.id}
+                                onClick={() => handleTabChange(item.id)}
+                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
+                                    ? 'bg-mg text-white shadow-lg'
+                                    : 'text-white/70 hover:bg-[#6a0000] hover:text-white'
+                                    }`}
+                            >
+                                <span className="text-xl relative">
+                                    {item.icon}
                                     {item.id === 'notices' && unreadCount > 0 && (
-                                        <span className="bg-blue-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md">{unreadCount}</span>
+                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border-2 border-mg-dark rounded-full"></span>
                                     )}
-                                </div>
-                            )}
-                        </button>
+                                </span>
+                                {isSidebarOpen && (
+                                    <div className="flex-1 flex items-center justify-between">
+                                        <span className="font-semibold">{item.label}</span>
+                                        {item.id === 'notices' && unreadCount > 0 && (
+                                            <span className="bg-blue-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md">{unreadCount}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </button>
+                        )
                     ))}
                     <Link to="/" className="w-full flex items-center gap-4 px-4 py-3 text-white/70 hover:bg-[#6a0000] hover:text-white rounded-xl transition-all">
                         <span className="text-xl">🏠</span>

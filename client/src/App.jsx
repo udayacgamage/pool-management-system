@@ -7,10 +7,13 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import QRScanner from './pages/QRScanner';
 import CoachDashboard from './pages/CoachDashboard';
+import MaintenanceDashboard from './pages/MaintenanceDashboard';
+import AdminMaintenance from './pages/AdminMaintenance';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import StaffRoute from './components/StaffRoute';
 import CoachRoute from './components/CoachRoute';
+import MaintenanceRoute from './components/MaintenanceRoute';
 
 function App() {
   return (
@@ -37,6 +40,16 @@ function App() {
       {/* Coach Routes */}
       <Route element={<CoachRoute />}>
         <Route path="/coach" element={<CoachDashboard />} />
+      </Route>
+
+      {/* Maintenance Routes */}
+      <Route element={<MaintenanceRoute />}>
+        <Route path="/maintenance" element={<MaintenanceDashboard />} />
+      </Route>
+
+      {/* Admin Maintenance Management */}
+      <Route element={<AdminRoute />}>
+        <Route path="/admin/maintenance" element={<AdminMaintenance />} />
       </Route>
     </Routes>
   );

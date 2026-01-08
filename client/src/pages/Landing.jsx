@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
+import PoolStatus from '../components/PoolStatus';
 import api from '../services/api';
 import poolView from '../assets/gallery/pool_view.jpg';
 import poolAction from '../assets/gallery/pool_action.jpg';
@@ -258,6 +259,13 @@ const Landing = () => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                {/* Pool Status Widget */}
+                <section className="py-12 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <PoolStatus />
                     </div>
                 </section>
 

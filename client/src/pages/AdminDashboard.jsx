@@ -122,6 +122,7 @@ const AdminDashboard = () => {
         { id: 'reports', label: 'Audit Reports', icon: '📈' },
         { id: 'holidays', label: 'Holidays', icon: '📅' },
         { id: 'notices', label: 'Notice Board', icon: '📢' },
+        { id: 'maintenance', label: 'Maintenance', icon: '🔧' },
     ];
 
     const formatDate = (d) => new Date(d).toLocaleDateString();
@@ -456,6 +457,19 @@ const AdminDashboard = () => {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                )}
+
+                {activeTab === 'maintenance' && (
+                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden p-8">
+                        <div className="text-center">
+                            <div className="text-6xl mb-4">🔧</div>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-2">Maintenance Management</h3>
+                            <p className="text-slate-500 mb-6">View and approve maintenance reports</p>
+                            <Link to="/admin/maintenance" className="btn-maroon px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg inline-block">
+                                Go to Maintenance Dashboard →
+                            </Link>
+                        </div>
                     </div>
                 )}
             </main>

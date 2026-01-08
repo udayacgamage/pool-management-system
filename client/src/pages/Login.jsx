@@ -23,6 +23,8 @@ const Login = () => {
                 navigate('/scanner');
             } else if (userData.role === 'coach') {
                 navigate('/coach');
+            } else if (userData.role === 'maintenance') {
+                navigate('/maintenance');
             } else {
                 navigate('/dashboard');
             }

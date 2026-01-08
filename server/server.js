@@ -49,6 +49,7 @@ app.use('/api/notices', require('./routes/noticeRoutes'));
 app.use('/api/holidays', require('./routes/holidayRoutes'));
 app.use('/api/coach-allocations', require('./routes/coachRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
 
 const { initSlotGenerationJob, generateSlots } = require('./jobs/slotGenerationJob');
 
