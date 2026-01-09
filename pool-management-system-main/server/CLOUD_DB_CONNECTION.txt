@@ -1,0 +1,9 @@
+MongoDB Atlas Connection String:
+mongodb+srv://tharindu:wC7K0N0a3tfdkhwu@poolmanagementsystem.whocug5.mongodb.net/pool-management?appName=PoolManagementSystem
+
+Username: tharindu
+Password: wC7K0N0a3tfdkhwu
+Cluster: poolmanagementsystem.whocug5.mongodb.net
+Database Name: pool-management
+
+Use this string for the MONGO_URI environment variable in Vercel.

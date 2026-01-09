@@ -16,17 +16,22 @@ A full-stack MERN application for managing swimming pool operations at the Unive
 - **Digital ID Card**: Auto-generated QR Code card for facility access (Downloadable).
 - **Profile Management**: Upload and update profile pictures.
 - **Real-time Notices**: View important announcements from the admin.
+-**Email Notifications**: Instant confirmation and reminder emails for booked slots
 
 ### 🏊‍♂️ Coach Dashboard
 - **Schedule View**: View assigned slots and shifts.
 - **QR Scanner**: Integrated `html5-qrcode` scanner for verifying student IDs.
 - **Attendance Tracking**: Scanning a code verifies the booking and marks attendance in the database.
+- **Manual Check-in**: Admin/Coach can manually mark attendance in case of technical issues.
+-**Access Control**: Only assigned students for the day are visible
 
 ### 👨‍💼 Admin Dashboard
 - **Notice Management**: Create and delete notices (with email broadcast).
 - **Holiday Management**: Block out dates for pool maintenance or holidays.
 - **Coach Allocations**: Assign coaches to specific time slots.
 - **Slot Management**: Create, delete, and manage pool slots and capacities.
+-**Holiday & Maintenance Scheduling**: Block out pool for maintenance, holidays, or 
+   emergencies; disables bookings automatically.
 
 ---
 
@@ -57,6 +62,7 @@ npm install
 # MONGO_URI=mongodb://127.0.0.1:27017/usj-pool-local
 # JWT_SECRET=your_super_secret_key
 # NODE_ENV=development
+#
 # # Email Configuration (Gmail App Password)
 # SMTP_HOST=smtp.gmail.com
 # SMTP_PORT=587
