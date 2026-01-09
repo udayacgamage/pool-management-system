@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-gray-50 text-slate-900;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight;
+  }
+
+  /* Smooth anchor scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+
+  /* Neutral, interactive buttons */
+  .btn-primary {
+    @apply px-8 py-3 rounded-2xl transition-all duration-300 font-bold shadow-xl active:scale-[0.98] tracking-tight text-white focus:outline-none focus:ring-4;
+    background-color: #800000; /* maroon */
+    box-shadow: 0 10px 24px rgba(128, 0, 0, 0.25);
+    /* maroon focus ring */
+    --tw-ring-color: rgba(128, 0, 0, 0.25);
+  }
+  .btn-primary:hover { background-color: #6a0000; }
+  .btn-secondary {
+    @apply px-8 py-3 bg-white border rounded-2xl transition-all duration-300 font-bold shadow-sm active:scale-[0.98] tracking-tight border-slate-300 text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-300/40;
+  }
+  .btn-disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all duration-300 font-medium;
+  }
+
+  /* Interactive cards */
+  .card {
+    @apply bg-white rounded-2xl border border-slate-100 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-[2px];
+  }
+
+  /* Maroon CTA */
+  .btn-maroon {
+    @apply rounded-2xl font-bold shadow-xl transition-all active:scale-[0.98] text-white;
+    background-color: #800000;
+  }
+  .btn-maroon:hover { background-color: #6a0000; }
+
+  /* Outline CTA */
+  .btn-outline {
+    @apply rounded-2xl font-bold border border-slate-300 bg-white text-slate-800 shadow-sm hover:bg-slate-50 transition-all active:scale-[0.98];
+  }
+
+  /* Status pill */
+  .pill-status {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-white text-slate-800 border border-slate-200 shadow-lg text-xs font-black uppercase tracking-widest;
+  }
+
+  :root {
+    --mg: #800000;
+    --mg-dark: #5a0000;
+    --gold: #ffbf00;
+    --gold-dark: #bf8f00;
+  }
+
+  /* Maroon/Gold utilities */
+  .text-mg { color: var(--mg); }
+  .text-gold { color: var(--gold); }
+  .bg-mg { background-color: var(--mg); }
+  .bg-gold { background-color: var(--gold); }
+  /* added */
+  .bg-mg-dark { background-color: var(--mg-dark); }
+  .border-mg { border-color: var(--mg); }
+  .border-mg-dark { border-color: var(--mg-dark); }
+
+  /* Gold CTA (filled) */
+  .btn-gold {
+    @apply rounded-2xl font-bold shadow-xl transition-all active:scale-[0.98] text-white;
+    padding: 0.75rem 2rem;
+    color: #0b1220; /* slightly darker for better contrast */
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
+    transition: all 200ms ease;
+  }
+  .btn-gold:hover { filter: brightness(1.05); }
+  .btn-gold:active { transform: scale(0.98); }
+
+  /* Maroon→Gold tag pill */
+  .tag-mg-gold {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #fff;
+    background: linear-gradient(90deg, var(--mg) 0%, var(--mg-dark) 50%, var(--gold) 100%);
+  }
+
+  /* Soft motion utility */
+  .motion-soft {
+    transition:
+      transform 250ms ease,
+      box-shadow 250ms ease,
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      opacity 200ms ease;
+    will-change: transform, box-shadow;
+  }
+  .motion-soft:hover {
+    transform: translateY(-1px);
+  }
+
+  /* Hover text color utility */
+  .hover-text-mg:hover { color: var(--mg); }
+
+  /* Light maroon background utility */
+  .bg-mg-soft {
+    background: linear-gradient(135deg, #fff5f5 0%, #fdeaea 50%, #fbe9e9 100%);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+  }
+
+  /* Selection color aligned to brand */
+  ::selection {
+    background: rgba(128, 0, 0, 0.12);
+  }
+  ::-moz-selection {
+    background: rgba(128, 0, 0, 0.12);
+  }
+}
